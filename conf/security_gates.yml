@@ -1,0 +1,18 @@
+ValidUserToken:
+  class: Pantono\Authentication\Gates\ValidUserToken
+  parameters:
+    - "@Authentication"
+    - "@SecurityContext"
+    - "@EventDispatcher"
+ValidApiToken:
+  class: Pantono\Authentication\Gates\ValidApiToken
+  parameters:
+    - "@ApiAuthentication"
+    - "@SecurityContext"
+    - "@EventDispatcher"
+HasPermission:
+  class: Pantono\Authentication\Gates\HasPermission
+  depends:
+    - ValidUserToken
+  parameters:
+    - "@SecurityContext"
