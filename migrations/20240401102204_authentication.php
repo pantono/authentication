@@ -28,15 +28,15 @@ final class Authentication extends AbstractMigration
             ->create();
 
         $this->table('user_permission', ['id' => false])
-            ->addColumn('user_id', 'integer')
+            ->addColumn('user_id', 'integer', ['signed' => false])
             ->addColumn('permission_id', 'integer')
             ->addForeignKey('user_id', 'user', 'id')
             ->addForeignKey('permission_id', 'permission', 'id')
             ->create();
 
         $this->table('user_group', ['id' => false])
-            ->addColumn('user_id', 'integer')
-            ->addColumn('group_id', 'integer')
+            ->addColumn('user_id', 'integer', ['signed' => false])
+            ->addColumn('group_id', 'integer', ['signed' => false])
             ->addForeignKey('user_id', 'user', 'id')
             ->addForeignKey('group_id', 'group', 'id')
             ->create();
@@ -50,8 +50,8 @@ final class Authentication extends AbstractMigration
             ->create();
 
         $this->table('user_token')
-            ->addColumn('user_id', 'integer')
-            ->addColumn('api_token_id', 'integer')
+            ->addColumn('user_id', 'integer', ['signed' => false])
+            ->addColumn('api_token_id', 'integer', ['signed' => false])
             ->addColumn('token', 'string')
             ->addColumn('date_created', 'datetime')
             ->addColumn('date_expires', 'datetime')
@@ -61,7 +61,7 @@ final class Authentication extends AbstractMigration
             ->create();
 
         $this->table('user_password_reset')
-            ->addColumn('user_id', 'integer')
+            ->addColumn('user_id', 'integer', ['signed' => false])
             ->addColumn('token', 'string')
             ->addColumn('date_created', 'datetime')
             ->addColumn('date_expires', 'datetime')
