@@ -15,13 +15,16 @@ class UserAuthentication
     private Hydrator $hydrator;
     private string $userClass = User::class;
 
-    public function __construct(UserAuthenticationRepository $repository, Hydrator $hydrator, ?string $userClass = null)
+    public function __construct(UserAuthenticationRepository $repository, Hydrator $hydrator)
     {
         $this->repository = $repository;
         $this->hydrator = $hydrator;
-        if ($userClass) {
-            $this->userClass = $userClass;
-        }
+        $this->userClass = User::class;
+    }
+
+    public function setUserClass(string $class): void
+    {
+        $this->userClass = $class;
     }
 
     /**
