@@ -29,7 +29,7 @@ final class Authentication extends AbstractMigration
 
         $this->table('user_permission', ['id' => false])
             ->addColumn('user_id', 'integer', ['signed' => false])
-            ->addColumn('permission_id', 'integer')
+            ->addColumn('permission_id', 'integer', ['signed' => false])
             ->addForeignKey('user_id', 'user', 'id')
             ->addForeignKey('permission_id', 'permission', 'id')
             ->create();
