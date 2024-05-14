@@ -11,16 +11,16 @@ class UserAuthenticationRepository extends MysqlRepository
 {
     public function getUserByToken(string $token): ?array
     {
-        $select = $this->getDb()->select()->from('rb_user_token', [])
-            ->joinInner('cms_users', 'cms_users.id=rb_user_token.user_id')
-            ->where('rb_user_token.token=?', $token);
+        $select = $this->getDb()->select()->from('user_token', [])
+            ->joinInner('user', 'user.id=user_token.user_id')
+            ->where('user_token.token=?', $token);
 
         return $this->getDb()->fetchRow($select);
     }
 
     public function getUserTokenByToken(string $token): ?array
     {
-        $select = $this->getDb()->select()->from('rb_user_token')
+        $select = $this->getDb()->select()->from('user_token')
             ->where('token=?', $token);
 
         return $this->getDb()->fetchRow($select);
@@ -28,7 +28,7 @@ class UserAuthenticationRepository extends MysqlRepository
 
     public function getUserById(int $id): ?array
     {
-        return $this->selectSingleRow('cms_users', 'id', $id);
+        return $this->selectSingleRow('user', 'id', $id);
     }
 
     public function updateTokenLastSeen(UserToken $token): void
@@ -49,7 +49,7 @@ class UserAuthenticationRepository extends MysqlRepository
 
     public function getAllPermissions(): array
     {
-        return $this->selectAll('rb_permission', 'name');
+        return $this->selectAll('permission', 'name');
     }
 
     public function getGroupsForUser(User $user): array
