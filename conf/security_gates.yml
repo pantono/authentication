@@ -16,3 +16,11 @@ HasPermission:
     - ValidUserToken
   parameters:
     - "@SecurityContext"
+UserLoggedIn:
+  class: Pantono\Authentication\Gates\UserLoggedIn
+  depends:
+    - ValidUserToken
+  parameters:
+    - "@SecurityContext"
+    - "@Session"
+    - "@UserAuthentication"
