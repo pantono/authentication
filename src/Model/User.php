@@ -11,7 +11,7 @@ class User implements UserInterface
     use SavableModel;
 
     private int $id;
-    private string $email;
+    private string $emailAddress;
     private string $forename;
     private string $surname;
     private string $password;
@@ -36,14 +36,14 @@ class User implements UserInterface
         $this->id = $id;
     }
 
-    public function getEmail(): string
+    public function getEmailAddress(): string
     {
-        return $this->email;
+        return $this->emailAddress;
     }
 
-    public function setEmail(string $email): void
+    public function setEmailAddress(string $emailAddress): void
     {
-        $this->email = $email;
+        $this->emailAddress = $emailAddress;
     }
 
     public function getForename(): string
