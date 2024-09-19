@@ -10,7 +10,7 @@ class User implements UserInterface
 {
     use SavableModel;
 
-    private int $id;
+    private ?int $id = null;
     private string $emailAddress;
     private string $forename;
     private string $surname;
@@ -26,12 +26,12 @@ class User implements UserInterface
      */
     private array $groups;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function setId(int $id): void
+    public function setId(?int $id): void
     {
         $this->id = $id;
     }
