@@ -1,0 +1,2 @@
+CreateUser:
+  class: Pantono\Authentication\Command\CreateUser
