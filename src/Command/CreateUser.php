@@ -27,7 +27,7 @@ class CreateUser extends Command
         $this->setName('user:create')
             ->addOption('email', 'e', InputArgument::OPTIONAL)
             ->addOption('forename', 'f', InputArgument::OPTIONAL)
-            ->addOption('surname', 'p', InputArgument::OPTIONAL);
+            ->addOption('surname', 's', InputArgument::OPTIONAL);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -64,11 +64,13 @@ class CreateUser extends Command
         $user->setPassword($password);
         $user->setDeleted(false);
         $user->setDisabled(false);
+        $user->setGroups([]);
+        $user->setPermissions([]);
         $this->authentication->saveUser($user);
 
         $output->writeln('<success>User created!</success>');
         $output->writeln('Username: ' . $email);
-        $output->write('Password: ' . $password);
+        $output->writeLn('Password: ' . $password);
         return 0;
     }
 }
