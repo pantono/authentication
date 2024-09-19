@@ -63,6 +63,7 @@ class CreateUser extends Command
         $user->setSurname($surname);
         $user->setPassword($password);
         $user->setDeleted(false);
+        $user->setEmailAddress($email);
         $user->setDisabled(false);
         $user->setGroups([]);
         $user->setPermissions([]);
