@@ -60,4 +60,9 @@ class UserAuthentication
     {
         return $this->repository->getGroupsForUser($user);
     }
+
+    public function saveUser(User $user): void
+    {
+        $this->repository->saveUser($user);
+    }
 }
