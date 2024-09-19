@@ -59,4 +59,12 @@ class UserAuthenticationRepository extends MysqlRepository
             ->where('user_group.user_id=?', $user->getId());
         return $this->getDb()->fetchAll($select);
     }
+
+    public function saveUser(User $user): void
+    {
+        $id = $this->insertOrUpdate('user', 'id', $user->getId(), $user->getAllData());
+        if ($id) {
+            $user->setId($id);
+        }
+    }
 }
