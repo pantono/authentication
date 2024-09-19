@@ -25,6 +25,7 @@ final class Authentication extends AbstractMigration
             ->addColumn('password', 'string')
             ->addColumn('deleted', 'boolean')
             ->addColumn('disabled', 'boolean')
+            ->addIndex(['email_address'], ['unique' => true])
             ->create();
 
         $this->table('user_permission', ['id' => false])
