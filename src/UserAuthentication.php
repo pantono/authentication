@@ -8,6 +8,7 @@ use Pantono\Authentication\Model\User;
 use Pantono\Authentication\Model\UserToken;
 use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Model\Permission;
+use Pantono\Utilities\StringUtilities;
 
 class UserAuthentication
 {
@@ -70,4 +71,35 @@ class UserAuthentication
     {
         $this->repository->saveUser($user);
     }
+
+    public function addTokenForUser(User $user, ?\DateTimeImmutable $expires = null, ?int $apiTokenId = null): UserToken
+    {
+        if ($expires === null) {
+            $expires = new \DateTimeImmutable('+1 day');
+        }
+        $id = $user->getId();
+        if ($id === null) {
+            throw new \RuntimeException('User must be saved first');
+        }
+        $token = new UserToken();
+        $token->setUser($user);
+        $token->setUserId($id);
+        $token->setDateCreated(new \DateTimeImmutable());
+        $token->setToken($this->getAvailableToken());
+        $token->setDateExpires($expires);
+        $token->setApiTokenId($apiTokenId ?: 0);
+        $token->setDateLastUsed(new \DateTimeImmutable());
+        $this->repository->saveToken($token);
+        return $token;
+    }
+
+    private function getAvailableToken(): string
+    {
+        $token = StringUtilities::generateRandomString(30);
+        while (!empty($this->repository->getUserByToken($token))) {
+            $token = StringUtilities::generateRandomString(30);
+        }
+        return $token;
+    }
+
 }

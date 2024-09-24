@@ -72,4 +72,12 @@ class UserAuthenticationRepository extends MysqlRepository
     {
         return $this->selectSingleRow('user', 'email_address', $emailAddress);
     }
+
+    public function saveToken(UserToken $token): void
+    {
+        $id = $this->insertOrUpdate('user_token', 'id', $token->getId(), $token->getAllData());
+        if ($id) {
+            $token->setId($id);
+        }
+    }
 }
