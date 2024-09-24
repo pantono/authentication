@@ -101,5 +101,4 @@ class UserAuthentication
         }
         return $token;
     }
-
 }

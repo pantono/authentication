@@ -1,2 +1,4 @@
 CreateUser:
   class: Pantono\Authentication\Command\CreateUser
+CreateApiToken:
+  class: Pantono\Authentication\Command\CreateApiToken
