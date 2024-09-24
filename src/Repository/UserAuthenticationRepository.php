@@ -67,4 +67,9 @@ class UserAuthenticationRepository extends MysqlRepository
             $user->setId($id);
         }
     }
+
+    public function getUserByEmailAddress(string $emailAddress): ?array
+    {
+        return $this->selectSingleRow('user', 'email_address', $emailAddress);
+    }
 }

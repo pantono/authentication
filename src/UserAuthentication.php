@@ -41,6 +41,11 @@ class UserAuthentication
         return $this->hydrator->hydrate($this->userClass, $this->repository->getUserById($id));
     }
 
+    public function getUserByEmailAddress(string $emailAddress): ?UserInterface
+    {
+        return $this->hydrator->hydrate($this->userClass, $this->repository->getUserByEmailAddress($emailAddress));
+    }
+
     public function getUserTokenByToken(string $token): ?UserToken
     {
         return $this->hydrator->hydrate(UserToken::class, $this->repository->getUserTokenByToken($token));
