@@ -23,12 +23,12 @@ class CreateApiToken extends Command
     protected function configure()
     {
         $this->setName('api:token:create')
-            ->addOption('ApplicationName', 'n', InputOption::VALUE_OPTIONAL, 'Application Name');
+            ->addOption('application_name', 'name', InputOption::VALUE_OPTIONAL, 'Application Name');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $name = $input->getOption('ApplicationName');
+        $name = $input->getOption('application_name');
         $helper = new QuestionHelper();
         if (!$name) {
             $name = $helper->ask($input, $output, new Question('Enter application name: '));
