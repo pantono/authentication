@@ -57,11 +57,16 @@ class CreateUser extends Command
             throw new \RuntimeException('Surname is invalid');
         }
 
+        $current = $this->authentication->getUserByEmailAddress($email);
+        if ($current !== null) {
+            $output->writeln('<error>User already exists</error>');
+            return 1;
+        }
         $password = StringUtilities::generateRandomString(8);
         $user = new User();
         $user->setForename($forename);
         $user->setSurname($surname);
-        $user->setPassword($password);
+        $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
         $user->setDeleted(false);
         $user->setEmailAddress($email);
         $user->setDisabled(false);
