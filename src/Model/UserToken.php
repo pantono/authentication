@@ -15,7 +15,7 @@ class UserToken
 
     private ?int $id = null;
     private int $userId;
-    private int $apiTokenId;
+    private ?int $apiTokenId = null;
     #[NoSave]
     private ?string $userName = null;
     private ?string $token;
@@ -65,12 +65,12 @@ class UserToken
         $this->token = $token;
     }
 
-    public function getApiTokenId(): int
+    public function getApiTokenId(): ?int
     {
         return $this->apiTokenId;
     }
 
-    public function setApiTokenId(int $apiTokenId): void
+    public function setApiTokenId(?int $apiTokenId = null): void
     {
         $this->apiTokenId = $apiTokenId;
     }
