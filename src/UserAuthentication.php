@@ -95,9 +95,9 @@ class UserAuthentication
 
     private function getAvailableToken(): string
     {
-        $token = StringUtilities::generateRandomString(30);
+        $token = StringUtilities::generateRandomString(200);
         while (!empty($this->repository->getUserByToken($token))) {
-            $token = StringUtilities::generateRandomString(30);
+            $token = StringUtilities::generateRandomString(200);
         }
         return $token;
     }
