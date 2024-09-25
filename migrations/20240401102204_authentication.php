@@ -52,7 +52,7 @@ final class Authentication extends AbstractMigration
 
         $this->table('user_token')
             ->addColumn('user_id', 'integer', ['signed' => false])
-            ->addColumn('api_token_id', 'integer', ['signed' => false])
+            ->addColumn('api_token_id', 'integer', ['signed' => false, 'null' => true])
             ->addColumn('token', 'string')
             ->addColumn('date_created', 'datetime')
             ->addColumn('date_expires', 'datetime')
