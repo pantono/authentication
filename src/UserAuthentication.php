@@ -87,7 +87,7 @@ class UserAuthentication
         $token->setDateCreated(new \DateTimeImmutable());
         $token->setToken($this->getAvailableToken());
         $token->setDateExpires($expires);
-        $token->setApiTokenId($apiTokenId ?: 0);
+        $token->setApiTokenId($apiTokenId);
         $token->setDateLastUsed(new \DateTimeImmutable());
         $this->repository->saveToken($token);
         return $token;
