@@ -3,11 +3,10 @@
 namespace Pantono\Authentication\Model;
 
 use Pantono\Contracts\Attributes\Locator;
-use Pantono\Authentication\UserAuthentication;
 use Pantono\Contracts\Attributes\FieldName;
-use Pantono\Contracts\Attributes\Lazy;
 use Pantono\Contracts\Attributes\NoSave;
 use Pantono\Database\Traits\SavableModel;
+use Pantono\Contracts\Attributes\Lazy;
 
 class UserToken
 {
@@ -22,8 +21,8 @@ class UserToken
     private \DateTimeInterface $dateCreated;
     private \DateTimeInterface $dateExpires;
     private \DateTimeInterface $dateLastUsed;
-    #[Locator(className: UserAuthentication::class, methodName: 'getUserById'), FieldName('user_id'), Lazy, NoSave]
-    private User $user;
+    #[Locator(serviceName: 'UserAuthentication', methodName: 'getUserById'), FieldName('user_id'), NoSave, Lazy]
+    private ?User $user = null;
 
     public function getId(): ?int
     {
@@ -105,7 +104,7 @@ class UserToken
         $this->dateLastUsed = $dateLastUsed;
     }
 
-    public function getUser(): User
+    public function getUser(): ?User
     {
         return $this->user;
     }
