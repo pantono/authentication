@@ -62,12 +62,12 @@ class UserAuthentication
         $this->repository->updateTokenLastSeen($token);
     }
 
-    public function getGroupsForUser(User $user): array
+    public function getGroupsForUser(UserInterface $user): array
     {
         return $this->repository->getGroupsForUser($user);
     }
 
-    public function saveUser(User $user): void
+    public function saveUser(UserInterface $user): void
     {
         $this->repository->saveUser($user);
     }
