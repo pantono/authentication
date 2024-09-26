@@ -5,7 +5,6 @@ namespace Pantono\Authentication\Repository;
 use Pantono\Database\Repository\MysqlRepository;
 use Pantono\Authentication\Model\UserToken;
 use Pantono\Contracts\Locator\UserInterface;
-use Pantono\Authentication\Model\User;
 
 class UserAuthenticationRepository extends MysqlRepository
 {
@@ -52,7 +51,7 @@ class UserAuthenticationRepository extends MysqlRepository
         return $this->selectAll('permission', 'name');
     }
 
-    public function getGroupsForUser(User $user): array
+    public function getGroupsForUser(UserInterface $user): array
     {
         $select = $this->getDb()->select()->from('user_group', [])
             ->joinInner('group', 'user_group.group_id=group.id')
@@ -60,7 +59,7 @@ class UserAuthenticationRepository extends MysqlRepository
         return $this->getDb()->fetchAll($select);
     }
 
-    public function saveUser(User $user): void
+    public function saveUser(UserInterface $user): void
     {
         $id = $this->insertOrUpdate('user', 'id', $user->getId(), $user->getAllData());
         if ($id) {
