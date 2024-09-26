@@ -45,9 +45,6 @@ class ValidUserToken implements SecurityGateInterface
         if ($token->getDateExpires() <= new \DateTime) {
             throw new AccessDeniedException('You have been logged out');
         }
-        if ($token->getUser()->isDisabled()) {
-            throw new AccessDeniedException('Your user account has been suspended');
-        }
 
         $token->setDateLastUsed(new \DateTime);
         $this->authentication->updateTokenLastSeen($token);
