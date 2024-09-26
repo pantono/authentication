@@ -72,7 +72,7 @@ class UserAuthentication
         $this->repository->saveUser($user);
     }
 
-    public function addTokenForUser(User $user, ?\DateTimeImmutable $expires = null, ?int $apiTokenId = null): UserToken
+    public function addTokenForUser(UserInterface $user, ?\DateTimeImmutable $expires = null, ?int $apiTokenId = null): UserToken
     {
         if ($expires === null) {
             $expires = new \DateTimeImmutable('+1 day');
