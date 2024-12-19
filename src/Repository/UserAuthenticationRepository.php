@@ -54,7 +54,7 @@ class UserAuthenticationRepository extends MysqlRepository
     public function getGroupsForUser(UserInterface $user): array
     {
         $select = $this->getDb()->select()->from('user_group', [])
-            ->joinInner('group', 'user_group.group_id=group.id')
+            ->joinInner(['g' => '`group`'], 'user_group.group_id=g.id')
             ->where('user_group.user_id=?', $user->getId());
         return $this->getDb()->fetchAll($select);
     }
