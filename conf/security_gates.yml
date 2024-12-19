@@ -18,6 +18,7 @@ HasPermission:
     - "@SecurityContext"
 UserLoggedIn:
   class: Pantono\Authentication\Gates\UserLoggedIn
+  global: true
   parameters:
     - "@SecurityContext"
     - "@Session"
