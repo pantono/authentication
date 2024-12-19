@@ -9,6 +9,7 @@ use Pantono\Authentication\Model\UserToken;
 use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Model\Permission;
 use Pantono\Utilities\StringUtilities;
+use Pantono\Authentication\Model\Group;
 
 class UserAuthentication
 {
@@ -62,9 +63,12 @@ class UserAuthentication
         $this->repository->updateTokenLastSeen($token);
     }
 
+    /**
+     * @return Group[]
+     */
     public function getGroupsForUser(UserInterface $user): array
     {
-        return $this->repository->getGroupsForUser($user);
+        return $this->hydrator->hydrateSet(Group::class, $this->repository->getGroupsForUser($user));
     }
 
     public function saveUser(UserInterface $user): void

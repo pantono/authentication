@@ -5,6 +5,9 @@ namespace Pantono\Authentication\Model;
 use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Exception\PasswordNeedsRehashException;
 use Pantono\Database\Traits\SavableModel;
+use Pantono\Contracts\Attributes\Locator;
+use Pantono\Authentication\UserAuthentication;
+use Pantono\Contracts\Attributes\FieldName;
 
 class User implements UserInterface
 {
@@ -24,6 +27,7 @@ class User implements UserInterface
     /**
      * @var Group[]
      */
+    #[Locator(methodName: 'getGroupsForUser', className: UserAuthentication::class), FieldName('$this')]
     private array $groups;
 
     public function getId(): ?int
