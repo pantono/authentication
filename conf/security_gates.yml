@@ -24,6 +24,7 @@ UserLoggedIn:
     - "@UserAuthentication"
 MaybeLoggedIn:
   class: Pantono\Authentication\Gates\MaybeLoggedIn
+  global: true
   parameters:
     - "@SecurityContext"
     - "@Session"
