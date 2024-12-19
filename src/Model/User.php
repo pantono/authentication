@@ -118,6 +118,15 @@ class User implements UserInterface
         return $this->groups;
     }
 
+    public function getGroupNames(): array
+    {
+        $groups = [];
+        foreach ($this->getGroups() as $group) {
+            $groups[] = $group->getName();
+        }
+        return $groups;
+    }
+
     public function setGroups(array $groups): void
     {
         $this->groups = $groups;
