@@ -23,6 +23,7 @@ class User implements UserInterface
     /**
      * @var Permission[]
      */
+    #[Locator(methodName: 'getPermissionsForUser', className: UserAuthentication::class), FieldName('$this')]
     private array $permissions;
     /**
      * @var Group[]
