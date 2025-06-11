@@ -69,5 +69,26 @@ final class Authentication extends AbstractMigration
             ->addColumn('completed', 'boolean')
             ->addForeignKey('user_id', 'user', 'id')
             ->create();
+
+        $this->table('social_login_provider')
+            ->addColumn('name', 'string')
+            ->addColumn('display_name', 'string')
+            ->addColumn('enabled', 'boolean', ['default' => true])
+            ->addIndex(['name'], ['unique' => true])
+            ->create();
+
+        $this->table('user_social_login')
+            ->addColumn('user_id', 'integer', ['signed' => false])
+            ->addColumn('provider_id', 'integer', ['signed' => false])
+            ->addColumn('provider_user_id', 'string') // The unique ID from the provider
+            ->addColumn('access_token', 'text', ['null' => true])
+            ->addColumn('refresh_token', 'text', ['null' => true])
+            ->addColumn('token_expires', 'datetime', ['null' => true])
+            ->addColumn('date_connected', 'datetime')
+            ->addColumn('last_used', 'datetime', ['null' => true])
+            ->addForeignKey('user_id', 'user', 'id', ['delete' => 'CASCADE'])
+            ->addForeignKey('provider_id', 'social_login_provider', 'id')
+            ->addIndex(['provider_id', 'provider_user_id'], ['unique' => true])
+            ->create();
     }
 }
