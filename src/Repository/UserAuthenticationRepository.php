@@ -82,4 +82,9 @@ class UserAuthenticationRepository extends MysqlRepository
             'data' => json_encode($data)
         ]);
     }
+
+    public function getProviderTypeById(int $id): ?array
+    {
+        return $this->selectSingleRow('login_provider_type', 'id', $id);
+    }
 }

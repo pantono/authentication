@@ -19,6 +19,7 @@ use Pantono\Authentication\Model\LoginProvider;
 use Pantono\Authentication\Model\LoginProviderUser;
 use Pantono\Hydrator\Locator\StaticLocator;
 use Pantono\Utilities\RequestHelper;
+use Pantono\Authentication\Model\LoginProviderType;
 
 class UserAuthentication
 {
@@ -36,6 +37,11 @@ class UserAuthentication
     public function getUserTokenByToken(string $token): ?UserToken
     {
         return $this->hydrator->hydrate(UserToken::class, $this->repository->getUserTokenByToken($token));
+    }
+
+    public function getProviderTypeById(int $id): ?LoginProviderType
+    {
+        return $this->hydrator->hydrate(LoginProviderType::class, $this->repository->getProviderTypeById($id));
     }
 
     public function getAuthenticationProvider(LoginProvider $loginProvider): AbstractAuthenticationProvider
