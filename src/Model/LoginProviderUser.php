@@ -18,10 +18,10 @@ class LoginProviderUser
     private ?LoginProvider $provider = null;
     private string $providerUserId;
     private string $accessToken;
-    private string $refreshToken;
+    private ?string $refreshToken = null;
     private \DateTimeInterface $tokenExpires;
     private \DateTimeInterface $dateConnected;
-    private ?\DateTimeInterface $dateLastUsed = null;
+    private ?\DateTimeInterface $lastUsed = null;
 
     public function getId(): ?int
     {
@@ -42,7 +42,7 @@ class LoginProviderUser
     {
         $this->userId = $userId;
     }
-    
+
     public function getProvider(): ?LoginProvider
     {
         return $this->provider;
@@ -73,12 +73,12 @@ class LoginProviderUser
         $this->accessToken = $accessToken;
     }
 
-    public function getRefreshToken(): string
+    public function getRefreshToken(): ?string
     {
         return $this->refreshToken;
     }
 
-    public function setRefreshToken(string $refreshToken): void
+    public function setRefreshToken(?string $refreshToken): void
     {
         $this->refreshToken = $refreshToken;
     }
@@ -103,13 +103,13 @@ class LoginProviderUser
         $this->dateConnected = $dateConnected;
     }
 
-    public function getDateLastUsed(): ?\DateTimeInterface
+    public function getLastUsed(): ?\DateTimeInterface
     {
-        return $this->dateLastUsed;
+        return $this->lastUsed;
     }
 
-    public function setDateLastUsed(?\DateTimeInterface $dateLastUsed): void
+    public function setLastUsed(?\DateTimeInterface $lastUsed): void
     {
-        $this->dateLastUsed = $dateLastUsed;
+        $this->lastUsed = $lastUsed;
     }
 }

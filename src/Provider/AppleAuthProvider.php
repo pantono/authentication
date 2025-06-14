@@ -50,7 +50,7 @@ class AppleAuthProvider extends AbstractAuthenticationProvider
         $userLogin = new LoginProviderUser();
         $userLogin->setAccessToken($token->getToken());
         $userLogin->setDateConnected(new \DateTime);
-        $userLogin->setDateLastUsed(new \DateTime);
+        $userLogin->setLastUsed(new \DateTime);
         $userLogin->setProvider($this->getProviderConfig());
         if ($token->getRefreshToken()) {
             $userLogin->setRefreshToken($token->getRefreshToken());
