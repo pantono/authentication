@@ -10,18 +10,19 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Pantono\Contracts\Security\SecurityContextInterface;
 use Pantono\Authentication\Exception\AccessDeniedException;
 use Pantono\Authentication\UserAuthentication;
+use Pantono\Authentication\Users;
 
 class UserLoggedIn implements SecurityGateInterface
 {
     private SecurityContextInterface $securityContext;
     private Session $session;
-    private UserAuthentication $authentication;
+    private Users $users;
 
-    public function __construct(SecurityContextInterface $securityContext, Session $session, UserAuthentication $authentication)
+    public function __construct(SecurityContextInterface $securityContext, Session $session, Users $users)
     {
         $this->securityContext = $securityContext;
         $this->session = $session;
-        $this->authentication = $authentication;
+        $this->users = $users;
     }
 
     public function isValid(Request $request, EndpointDefinitionInterface $endpoint, ParameterBag $options, ?Session $session = null): void
@@ -30,7 +31,7 @@ class UserLoggedIn implements SecurityGateInterface
         if ($userId === null) {
             throw new AccessDeniedException('You are not logged in');
         }
-        $user = $this->authentication->getUserById($userId);
+        $user = $this->users->getUserById($userId);
         if ($user === null) {
             throw new AccessDeniedException('You are not logged in');
         }

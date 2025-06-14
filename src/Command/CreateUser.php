@@ -11,14 +11,15 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
 use Pantono\Utilities\StringUtilities;
 use Pantono\Authentication\Model\User;
+use Pantono\Authentication\Users;
 
 class CreateUser extends Command
 {
-    private UserAuthentication $authentication;
+    private Users $users;
 
-    public function __construct(UserAuthentication $authentication)
+    public function __construct(Users $users)
     {
-        $this->authentication = $authentication;
+        $this->users = $users;
         parent::__construct();
     }
 
@@ -57,7 +58,7 @@ class CreateUser extends Command
             throw new \RuntimeException('Surname is invalid');
         }
 
-        $current = $this->authentication->getUserByEmailAddress($email);
+        $current = $this->users->getUserByEmailAddress($email);
         if ($current !== null) {
             $output->writeln('<error>User already exists</error>');
             return 1;
@@ -72,7 +73,8 @@ class CreateUser extends Command
         $user->setDisabled(false);
         $user->setGroups([]);
         $user->setPermissions([]);
-        $this->authentication->saveUser($user);
+        $user->setFields([]);
+        $this->users->saveUser($user);
 
         $output->writeln('<success>User created!</success>');
         $output->writeln('Username: ' . $email);

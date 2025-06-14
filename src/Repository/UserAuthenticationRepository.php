@@ -4,7 +4,9 @@ namespace Pantono\Authentication\Repository;
 
 use Pantono\Database\Repository\MysqlRepository;
 use Pantono\Authentication\Model\UserToken;
+use Pantono\Authentication\Model\LoginProviderUser;
 use Pantono\Contracts\Locator\UserInterface;
+use Pantono\Authentication\Model\LoginProvider;
 
 class UserAuthenticationRepository extends MysqlRepository
 {
@@ -25,9 +27,41 @@ class UserAuthenticationRepository extends MysqlRepository
         return $this->getDb()->fetchRow($select);
     }
 
-    public function getUserById(int $id): ?array
+    public function saveToken(UserToken $token): void
     {
-        return $this->selectSingleRow('user', 'id', $id);
+        $id = $this->insertOrUpdate('user_token', 'id', $token->getId(), $token->getAllData());
+        if ($id) {
+            $token->setId($id);
+        }
+    }
+
+    public function getSocialProviderById(int $id): ?array
+    {
+        return $this->selectSingleRow('social_login_provider', 'id', $id);
+    }
+
+    public function getSocialLoginsForUser(UserInterface $user): array
+    {
+        return $this->selectRowsByValues('user_social_login', ['user_id' => $user->getId()]);
+    }
+
+    public function saveSocialLogin(LoginProviderUser $socialLogin): void
+    {
+        $data = $socialLogin->getAllData();
+        $id = $this->insertOrUpdate('user_social_login', 'id', $socialLogin->getId(), $data);
+        if ($id) {
+            $socialLogin->setId($id);
+        }
+    }
+
+    public function getUserByProviderLogin(LoginProvider $provider, string $providerUserId): ?array
+    {
+        $select = $this->getDb()->select()->from('user_social_login', [])
+            ->joinInner('user', 'user.id=user_social_login.user_id')
+            ->where('user_social_login.provider_id=?', $provider->getId())
+            ->where('user_social_login.provider_user_id=?', $providerUserId);
+
+        return $this->getDb()->fetchRow($select);
     }
 
     public function updateTokenLastSeen(UserToken $token): void
@@ -37,46 +71,15 @@ class UserAuthenticationRepository extends MysqlRepository
         ], ['id=?' => $token->getId()]);
     }
 
-    public function getPermissionsForUser(UserInterface $user): array
+    public function addLogForProvider(LoginProvider $provider, string $entry, ?string $ipAddress, ?int $userId, ?string $sessionId = null, ?array $data = null): void
     {
-        $select = $this->getDb()->select()->from('user_permission', [])
-            ->joinInner('permission', 'user_permission.permission_id=permission.id')
-            ->where('user_permission.user_id=?', $user->getId());
-
-        return $this->getDb()->fetchAll($select);
-    }
-
-    public function getAllPermissions(): array
-    {
-        return $this->selectAll('permission', 'name');
-    }
-
-    public function getGroupsForUser(UserInterface $user): array
-    {
-        $select = $this->getDb()->select()->from('user_group', [])
-            ->joinInner(['g' => '`group`'], 'user_group.group_id=g.id')
-            ->where('user_group.user_id=?', $user->getId());
-        return $this->getDb()->fetchAll($select);
-    }
-
-    public function saveUser(UserInterface $user): void
-    {
-        $id = $this->insertOrUpdate('user', 'id', $user->getId(), $user->getAllData());
-        if ($id) {
-            $user->setId($id);
-        }
-    }
-
-    public function getUserByEmailAddress(string $emailAddress): ?array
-    {
-        return $this->selectSingleRow('user', 'email_address', $emailAddress);
-    }
-
-    public function saveToken(UserToken $token): void
-    {
-        $id = $this->insertOrUpdate('user_token', 'id', $token->getId(), $token->getAllData());
-        if ($id) {
-            $token->setId($id);
-        }
+        $this->getDb()->insert('authentication_log', [
+            'provider_id' => $provider->getId(),
+            'entry' => $entry,
+            'ip_address' => $ipAddress,
+            'user_id' => $userId,
+            'session_id' => $sessionId,
+            'data' => json_encode($data)
+        ]);
     }
 }

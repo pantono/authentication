@@ -45,6 +45,9 @@ class ValidUserToken implements SecurityGateInterface
         if ($token->getDateExpires() <= new \DateTime) {
             throw new AccessDeniedException('You have been logged out');
         }
+        if (!$token->getUser()) {
+            throw new AccessDeniedException('You are not logged in');
+        }
 
         $token->setDateLastUsed(new \DateTime);
         $this->authentication->updateTokenLastSeen($token);
@@ -52,7 +55,9 @@ class ValidUserToken implements SecurityGateInterface
         $this->securityContext->set('user_token', $token);
 
         $event = new UserAuthenticatedEvent();
-        $event->setUser($token->getUser());
+        if ($token->getUser()) {
+            $event->setUser($token->getUser());
+        }
         $event->setSecurityContext($this->securityContext);
         $this->dispatcher->dispatch($event);
     }

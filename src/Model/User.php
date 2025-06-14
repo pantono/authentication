@@ -8,12 +8,16 @@ use Pantono\Database\Traits\SavableModel;
 use Pantono\Contracts\Attributes\Locator;
 use Pantono\Authentication\UserAuthentication;
 use Pantono\Contracts\Attributes\FieldName;
+use Pantono\Authentication\Users;
 
 class User implements UserInterface
 {
     use SavableModel;
 
     private ?int $id = null;
+    private \DateTimeInterface $dateCreated;
+    private ?\DateTimeInterface $dateLastLogin = null;
+
     private string $emailAddress;
     private string $forename;
     private string $surname;
@@ -30,6 +34,11 @@ class User implements UserInterface
      */
     #[Locator(methodName: 'getGroupsForUser', className: UserAuthentication::class), FieldName('$this')]
     private array $groups;
+    /**
+     * @var UserField[]
+     */
+    #[Locator(methodName: 'getFieldsForUser', className: Users::class), FieldName('$this')]
+    private array $fields = [];
 
     public function getId(): ?int
     {
@@ -39,6 +48,26 @@ class User implements UserInterface
     public function setId(?int $id): void
     {
         $this->id = $id;
+    }
+
+    public function getDateCreated(): \DateTimeInterface
+    {
+        return $this->dateCreated;
+    }
+
+    public function setDateCreated(\DateTimeInterface $dateCreated): void
+    {
+        $this->dateCreated = $dateCreated;
+    }
+
+    public function getDateLastLogin(): ?\DateTimeInterface
+    {
+        return $this->dateLastLogin;
+    }
+
+    public function setDateLastLogin(?\DateTimeInterface $dateLastLogin): void
+    {
+        $this->dateLastLogin = $dateLastLogin;
     }
 
     public function getEmailAddress(): string
@@ -151,5 +180,15 @@ class User implements UserInterface
             }
         }
         return false;
+    }
+
+    public function getFields(): array
+    {
+        return $this->fields;
+    }
+
+    public function setFields(array $fields): void
+    {
+        $this->fields = $fields;
     }
 }

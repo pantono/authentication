@@ -10,42 +10,27 @@ use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Model\Permission;
 use Pantono\Utilities\StringUtilities;
 use Pantono\Authentication\Model\Group;
+use Pantono\Authentication\Exception\UserDoesNotExistException;
+use Pantono\Authentication\Exception\PasswordNeedsRehashException;
+use Pantono\Authentication\Exception\InvalidPasswordException;
+use Pantono\Authentication\Provider\PasswordAuthentication;
+use Pantono\Authentication\Provider\AbstractAuthenticationProvider;
+use Pantono\Authentication\Model\LoginProvider;
+use Pantono\Authentication\Model\LoginProviderUser;
+use Pantono\Hydrator\Locator\StaticLocator;
+use Pantono\Utilities\RequestHelper;
 
 class UserAuthentication
 {
     private UserAuthenticationRepository $repository;
     private Hydrator $hydrator;
-    private string $userClass = User::class;
+    private Users $users;
 
-    public function __construct(UserAuthenticationRepository $repository, Hydrator $hydrator)
+    public function __construct(UserAuthenticationRepository $repository, Hydrator $hydrator, Users $users)
     {
         $this->repository = $repository;
         $this->hydrator = $hydrator;
-        $this->userClass = User::class;
-    }
-
-    public function setUserClass(string $class): void
-    {
-        $this->userClass = $class;
-    }
-
-    /**
-     * @param UserInterface $user
-     * @return Permission[]
-     */
-    public function getPermissionsForUser(UserInterface $user): array
-    {
-        return $this->repository->getPermissionsForUser($user);
-    }
-
-    public function getUserById(int $id): ?UserInterface
-    {
-        return $this->hydrator->hydrate($this->userClass, $this->repository->getUserById($id));
-    }
-
-    public function getUserByEmailAddress(string $emailAddress): ?UserInterface
-    {
-        return $this->hydrator->hydrate($this->userClass, $this->repository->getUserByEmailAddress($emailAddress));
+        $this->users = $users;
     }
 
     public function getUserTokenByToken(string $token): ?UserToken
@@ -53,30 +38,27 @@ class UserAuthentication
         return $this->hydrator->hydrate(UserToken::class, $this->repository->getUserTokenByToken($token));
     }
 
-    public function getUserByToken(string $token): ?UserInterface
+    public function getAuthenticationProvider(LoginProvider $loginProvider): AbstractAuthenticationProvider
     {
-        return $this->hydrator->hydrate($this->userClass, $this->repository->getUserByToken($token));
+        if (!$loginProvider->getType()) {
+            throw new \RuntimeException('Authentication provider does not exist');
+        }
+        $providerClass = $loginProvider->getType()->getProviderClass();
+        if (!class_exists($providerClass)) {
+            throw new \RuntimeException('Authentication provider does not exist');
+        }
+        $provider = StaticLocator::getLocator()->getClassAutoWire($providerClass);
+        if (!$provider instanceof AbstractAuthenticationProvider) {
+            throw new \RuntimeException('Authentication provider does not exist');
+        }
+        $provider->setAuthentication($this);
+        $provider->setProviderConfig($loginProvider);
+        $provider->setUsers($this->users);
+        return $provider;
     }
 
-    public function updateTokenLastSeen(UserToken $token): void
-    {
-        $this->repository->updateTokenLastSeen($token);
-    }
 
-    /**
-     * @return Group[]
-     */
-    public function getGroupsForUser(UserInterface $user): array
-    {
-        return $this->hydrator->hydrateSet(Group::class, $this->repository->getGroupsForUser($user));
-    }
-
-    public function saveUser(UserInterface $user): void
-    {
-        $this->repository->saveUser($user);
-    }
-
-    public function addTokenForUser(UserInterface $user, ?\DateTimeImmutable $expires = null, ?int $apiTokenId = null): UserToken
+    public function addTokenForUser(User $user, ?\DateTimeImmutable $expires = null, ?int $apiTokenId = null): UserToken
     {
         if ($expires === null) {
             $expires = new \DateTimeImmutable('+1 day');
@@ -104,5 +86,39 @@ class UserAuthentication
             $token = StringUtilities::generateRandomString(200);
         }
         return $token;
+    }
+
+    public function getLoginProviderById(int $id): ?LoginProvider
+    {
+        return $this->hydrator->hydrate(LoginProvider::class, $this->repository->getSocialProviderById($id));
+    }
+
+    /**
+     * @return LoginProviderUser[]
+     */
+    public function getUserProviderLogins(User $user): array
+    {
+        return $this->hydrator->hydrateSet(LoginProviderUser::class, $this->repository->getSocialLoginsForUser($user));
+    }
+
+    public function saveSocialLogin(LoginProviderUser $socialLogin): void
+    {
+        $this->repository->saveSocialLogin($socialLogin);
+    }
+
+    public function getUserByProviderLogin(LoginProvider $provider, string $userId): ?User
+    {
+        return $this->hydrator->hydrate(User::class, $this->repository->getUserByProviderLogin($provider, $userId));
+    }
+
+    public function updateTokenLastSeen(UserToken $token): void
+    {
+        $this->repository->updateTokenLastSeen($token);
+    }
+
+    public function addLogForProvider(LoginProvider $provider, string $entry, ?int $userId = null, ?string $sessionId = null, ?array $data = null): void
+    {
+        $ipAddress = RequestHelper::getIp();
+        $this->repository->addLogForProvider($provider, $entry, $ipAddress, $userId, $sessionId, $data);
     }
 }

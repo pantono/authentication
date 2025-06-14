@@ -2,3 +2,7 @@ ApiAuthentication:
   class: Pantono\Authentication\ApiAuthentication
 UserAuthentication:
   class: Pantono\Authentication\UserAuthentication
+GoogleAuthProvider:
+  class: Pantono\Authentication\Provider\GoogleAuthProvider
+Users:
+  class: Pantono\Authentication\Users
