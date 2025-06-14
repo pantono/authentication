@@ -27,10 +27,11 @@ class GoogleAuthProvider extends AbstractAuthenticationProvider
 
     public function initiateLogin(): ?string
     {
+        $url = $this->getGoogleClient()->getAuthorizationUrl(['scopes' => $this->scopes]);
         $state = $this->getGoogleClient()->getState();
         $this->authentication->addLogForProvider($this->getProviderConfig(), 'Initiating login with google', null, $this->getSession()->getId(), ['state' => $state]);
         $this->getSession()->set('google_oauth_state', $state);
-        return $this->getGoogleClient()->getAuthorizationUrl(['scopes' => $this->scopes]);
+        return $url;
     }
 
     public function authenticate(array $options = []): UserInterface
