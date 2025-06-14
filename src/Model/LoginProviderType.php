@@ -2,6 +2,10 @@
 
 namespace Pantono\Authentication\Model;
 
+use Pantono\Contracts\Attributes\Locator;
+use Pantono\Authentication\UserAuthentication;
+
+#[Locator(methodName: 'getProviderTypeById', className: UserAuthentication::class)]
 class LoginProviderType
 {
     private ?int $id = null;
