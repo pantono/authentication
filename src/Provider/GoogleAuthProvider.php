@@ -116,7 +116,7 @@ class GoogleAuthProvider extends AbstractAuthenticationProvider
 
     private function getSession(): Session
     {
-        $session = StaticLocator::getLocator()->getClassAutoWire(Session::class);
+        $session = StaticLocator::getLocator()->loadDependency('@Session');
         if (!$session) {
             throw new \RuntimeException('Session provider not setup');
         }
