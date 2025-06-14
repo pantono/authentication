@@ -37,18 +37,18 @@ class UserAuthenticationRepository extends MysqlRepository
 
     public function getSocialProviderById(int $id): ?array
     {
-        return $this->selectSingleRow('social_login_provider', 'id', $id);
+        return $this->selectSingleRow('login_provider', 'id', $id);
     }
 
     public function getSocialLoginsForUser(UserInterface $user): array
     {
-        return $this->selectRowsByValues('user_social_login', ['user_id' => $user->getId()]);
+        return $this->selectRowsByValues('login_provider_user', ['user_id' => $user->getId()]);
     }
 
     public function saveSocialLogin(LoginProviderUser $socialLogin): void
     {
         $data = $socialLogin->getAllData();
-        $id = $this->insertOrUpdate('user_social_login', 'id', $socialLogin->getId(), $data);
+        $id = $this->insertOrUpdate('login_provider_user', 'id', $socialLogin->getId(), $data);
         if ($id) {
             $socialLogin->setId($id);
         }
@@ -56,10 +56,10 @@ class UserAuthenticationRepository extends MysqlRepository
 
     public function getUserByProviderLogin(LoginProvider $provider, string $providerUserId): ?array
     {
-        $select = $this->getDb()->select()->from('user_social_login', [])
-            ->joinInner('user', 'user.id=user_social_login.user_id')
-            ->where('user_social_login.provider_id=?', $provider->getId())
-            ->where('user_social_login.provider_user_id=?', $providerUserId);
+        $select = $this->getDb()->select()->from('login_provider_user', [])
+            ->joinInner('user', 'user.id=login_provider_user.user_id')
+            ->where('login_provider_user.provider_id=?', $provider->getId())
+            ->where('login_provider_user.provider_user_id=?', $providerUserId);
 
         return $this->getDb()->fetchRow($select);
     }
