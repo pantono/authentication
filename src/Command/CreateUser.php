@@ -67,6 +67,7 @@ class CreateUser extends Command
         $user = new User();
         $user->setForename($forename);
         $user->setSurname($surname);
+        $user->setDateCreated(new \DateTimeImmutable());
         $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
         $user->setDeleted(false);
         $user->setEmailAddress($email);
