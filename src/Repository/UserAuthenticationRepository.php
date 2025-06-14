@@ -45,7 +45,7 @@ class UserAuthenticationRepository extends MysqlRepository
         return $this->selectRowsByValues('login_provider_user', ['user_id' => $user->getId()]);
     }
 
-    public function saveSocialLogin(LoginProviderUser $socialLogin): void
+    public function saveLoginProviderUser(LoginProviderUser $socialLogin): void
     {
         $data = $socialLogin->getAllData();
         $id = $this->insertOrUpdate('login_provider_user', 'id', $socialLogin->getId(), $data);

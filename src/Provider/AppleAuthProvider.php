@@ -67,7 +67,8 @@ class AppleAuthProvider extends AbstractAuthenticationProvider
         }
         $userLogin->setTokenExpires($expiry);
 
-        $this->authentication->saveSocialLogin($userLogin);
+        $this->authentication->saveLoginProviderUser($userLogin);
+        $this->authentication->addSuccessfulLoginForUser($user, $this->getProviderConfig());
         $this->authentication->addLogForProvider($this->getProviderConfig(), 'Successfully authenticated with apple', null, $this->getSession()->getId(), ['user_login' => $userLogin->getId()]);
 
         return $user;

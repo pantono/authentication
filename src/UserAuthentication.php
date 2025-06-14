@@ -6,32 +6,28 @@ use Pantono\Authentication\Repository\UserAuthenticationRepository;
 use Pantono\Hydrator\Hydrator;
 use Pantono\Authentication\Model\User;
 use Pantono\Authentication\Model\UserToken;
-use Pantono\Contracts\Locator\UserInterface;
-use Pantono\Authentication\Model\Permission;
 use Pantono\Utilities\StringUtilities;
-use Pantono\Authentication\Model\Group;
-use Pantono\Authentication\Exception\UserDoesNotExistException;
-use Pantono\Authentication\Exception\PasswordNeedsRehashException;
-use Pantono\Authentication\Exception\InvalidPasswordException;
-use Pantono\Authentication\Provider\PasswordAuthentication;
 use Pantono\Authentication\Provider\AbstractAuthenticationProvider;
 use Pantono\Authentication\Model\LoginProvider;
 use Pantono\Authentication\Model\LoginProviderUser;
 use Pantono\Hydrator\Locator\StaticLocator;
 use Pantono\Utilities\RequestHelper;
 use Pantono\Authentication\Model\LoginProviderType;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class UserAuthentication
 {
     private UserAuthenticationRepository $repository;
     private Hydrator $hydrator;
     private Users $users;
+    private Session $session;
 
-    public function __construct(UserAuthenticationRepository $repository, Hydrator $hydrator, Users $users)
+    public function __construct(UserAuthenticationRepository $repository, Hydrator $hydrator, Users $users, Session $session)
     {
         $this->repository = $repository;
         $this->hydrator = $hydrator;
         $this->users = $users;
+        $this->session = $session;
     }
 
     public function getUserTokenByToken(string $token): ?UserToken
@@ -42,6 +38,19 @@ class UserAuthentication
     public function getProviderTypeById(int $id): ?LoginProviderType
     {
         return $this->hydrator->hydrate(LoginProviderType::class, $this->repository->getProviderTypeById($id));
+    }
+
+    public function addSuccessfulLoginForUser(User $user, LoginProvider $provider): void
+    {
+        $this->session->set('user_id', $user->getId());
+        $this->session->set('login_provider', $provider->getId());
+        $this->addLogForProvider($provider, 'Successful login', $user->getId());
+    }
+
+    public function processLogout(): void
+    {
+        $this->session->remove('user_id');
+        $this->session->remove('login_provider');
     }
 
     public function getAuthenticationProvider(LoginProvider $loginProvider): AbstractAuthenticationProvider
@@ -107,9 +116,9 @@ class UserAuthentication
         return $this->hydrator->hydrateSet(LoginProviderUser::class, $this->repository->getSocialLoginsForUser($user));
     }
 
-    public function saveSocialLogin(LoginProviderUser $socialLogin): void
+    public function saveLoginProviderUser(LoginProviderUser $loginProviderUser): void
     {
-        $this->repository->saveSocialLogin($socialLogin);
+        $this->repository->saveLoginProviderUser($loginProviderUser);
     }
 
     public function getUserByProviderLogin(LoginProvider $provider, string $userId): ?User

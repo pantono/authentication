@@ -45,6 +45,7 @@ class PasswordAuthentication extends AbstractAuthenticationProvider
         }
         $user->setDateLastLogin(new \DateTimeImmutable());
         $this->users->saveUser($user);
+        $this->authentication->addSuccessfulLoginForUser($user, $this->getProviderConfig());
         return $user;
     }
 
