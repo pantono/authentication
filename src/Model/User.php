@@ -27,12 +27,12 @@ class User implements UserInterface
     /**
      * @var Permission[]
      */
-    #[Locator(methodName: 'getPermissionsForUser', className: UserAuthentication::class), FieldName('$this')]
+    #[Locator(methodName: 'getPermissionsForUser', className: Users::class), FieldName('$this')]
     private array $permissions;
     /**
      * @var Group[]
      */
-    #[Locator(methodName: 'getGroupsForUser', className: UserAuthentication::class), FieldName('$this')]
+    #[Locator(methodName: 'getGroupsForUser', className: Users::class), FieldName('$this')]
     private array $groups;
     /**
      * @var UserField[]
