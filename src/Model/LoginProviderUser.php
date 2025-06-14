@@ -7,6 +7,7 @@ use Pantono\Contracts\Attributes\Locator;
 use Pantono\Authentication\UserAuthentication;
 use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Database\Traits\SavableModel;
+use Pantono\Contracts\Attributes\Filter;
 
 class LoginProviderUser
 {
@@ -22,6 +23,8 @@ class LoginProviderUser
     private \DateTimeInterface $tokenExpires;
     private \DateTimeInterface $dateConnected;
     private ?\DateTimeInterface $lastUsed = null;
+    #[Filter('json_decode')]
+    private array $values = [];
 
     public function getId(): ?int
     {
@@ -111,5 +114,15 @@ class LoginProviderUser
     public function setLastUsed(?\DateTimeInterface $lastUsed): void
     {
         $this->lastUsed = $lastUsed;
+    }
+
+    public function getValues(): array
+    {
+        return $this->values;
+    }
+
+    public function setValues(array $values): void
+    {
+        $this->values = $values;
     }
 }

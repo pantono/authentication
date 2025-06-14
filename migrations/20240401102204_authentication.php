@@ -127,6 +127,7 @@ final class Authentication extends AbstractMigration
             ->addColumn('token_expires', 'datetime', ['null' => true])
             ->addColumn('date_connected', 'datetime')
             ->addColumn('last_used', 'datetime', ['null' => true])
+            ->addColumn('values', 'json', ['null' => true])
             ->addForeignKey('user_id', 'user', 'id', ['delete' => 'CASCADE'])
             ->addForeignKey('provider_id', 'login_provider', 'id')
             ->create();
