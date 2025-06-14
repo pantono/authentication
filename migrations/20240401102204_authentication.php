@@ -37,8 +37,8 @@ final class Authentication extends AbstractMigration
             ->create();
 
         $this->table('user_field')
-            ->addColumn('user_id', 'integer')
-            ->addColumn('field_type_id', 'integer')
+            ->addColumn('user_id', 'integer', ['signed' => false])
+            ->addColumn('field_type_id', 'integer', ['signed' => false])
             ->addColumn('value', 'text')
             ->addForeignKey('field_type_id', 'user_field_type', 'id')
             ->addForeignKey('user_id', 'user', 'id')
@@ -115,7 +115,7 @@ final class Authentication extends AbstractMigration
             ->addColumn('type_id', 'integer', ['signed' => false])
             ->addColumn('config', 'json')
             ->addColumn('enabled', 'boolean', ['default' => true])
-            ->addForeignKey('type_id', 'social_login_provider_type', 'id')
+            ->addForeignKey('type_id', 'login_provider_type', 'id')
             ->create();
 
         $this->table('login_provider_user')
@@ -140,7 +140,7 @@ final class Authentication extends AbstractMigration
             ->create();
 
         $this->table('authentication_log')
-            ->addColumn('provider_id', 'integer')
+            ->addColumn('provider_id', 'integer', ['signed' => false])
             ->addColumn('date', 'datetime')
             ->addColumn('session_id', 'string')
             ->addColumn('user_id', 'integer', ['signed' => false, 'null' => true])
