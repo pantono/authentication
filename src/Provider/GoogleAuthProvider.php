@@ -47,6 +47,7 @@ class GoogleAuthProvider extends AbstractAuthenticationProvider
         }
 
         $userLogin = new LoginProviderUser();
+        $userLogin->setUserId($user->getId());
         $userLogin->setAccessToken($token->getToken());
         $userLogin->setDateConnected(new \DateTime);
         $userLogin->setProviderUserId($resourceData['sub']);
