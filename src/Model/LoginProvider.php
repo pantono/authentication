@@ -5,11 +5,13 @@ namespace Pantono\Authentication\Model;
 use Pantono\Contracts\Attributes\Filter;
 use Pantono\Authentication\UserAuthentication;
 use Pantono\Contracts\Attributes\Locator;
+use Pantono\Contracts\Attributes\FieldName;
 
+#[Locator(methodName: 'getProviderById', className: UserAuthentication::class)]
 class LoginProvider
 {
     private ?int $id = null;
-    #[Locator(methodName: 'getProviderTypeById', className: UserAuthentication::class)]
+    #[Locator(methodName: 'getProviderTypeById', className: UserAuthentication::class), FieldName('type_id')]
     private ?LoginProviderType $type = null;
     /**
      * @var array<string,mixed>
