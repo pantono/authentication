@@ -129,7 +129,6 @@ final class Authentication extends AbstractMigration
             ->addColumn('last_used', 'datetime', ['null' => true])
             ->addForeignKey('user_id', 'user', 'id', ['delete' => 'CASCADE'])
             ->addForeignKey('provider_id', 'login_provider', 'id')
-            ->addIndex(['provider_id', 'provider_user_id'], ['unique' => true])
             ->create();
 
         $this->table('user_history')
