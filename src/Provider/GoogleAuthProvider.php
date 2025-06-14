@@ -39,7 +39,7 @@ class GoogleAuthProvider extends AbstractAuthenticationProvider
         $token = $this->getTokenFromOptions($options);
         $resource = $this->getGoogleClient()->getResourceOwner($token);
         $resourceData = $resource->toArray();
-        $user = $this->users->getUserByEmailAddress($resourceData['id']);
+        $user = $this->users->getUserByEmailAddress($resourceData['email']);
         $this->authentication->addLogForProvider($this->getProviderConfig(), 'Processed google data', null, $this->getSession()->getId(), ['resource_data' => $resource]);
         if ($user === null) {
             throw new UserDoesNotExistException('User does not exist');
