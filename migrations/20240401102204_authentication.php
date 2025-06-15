@@ -133,10 +133,12 @@ final class Authentication extends AbstractMigration
             ->create();
 
         $this->table('user_history')
-            ->addColumn('user_id', 'integer', ['signed' => false])
+            ->addColumn('target_user_id', 'integer', ['signed' => false])
+            ->addColumn('by_user_id', 'integer', ['signed' => false, 'null' => true])
             ->addColumn('date', 'datetime')
             ->addColumn('entry', 'string')
-            ->addForeignKey('user_id', 'user', 'id', ['delete' => 'CASCADE'])
+            ->addForeignKey('target_user_id', 'user', 'id', ['delete' => 'CASCADE'])
+            ->addForeignKey('by_user_id', 'user', 'id', ['delete' => 'CASCADE'])
             ->create();
 
         $this->table('authentication_log')
@@ -151,5 +153,13 @@ final class Authentication extends AbstractMigration
             ->addForeignKey('provider_id', 'login_provider', 'id', ['delete' => 'CASCADE'])
             ->addForeignKey('user_id', 'user', 'id', ['delete' => 'CASCADE'])
             ->create();
+
+        if ($this->isMigratingUp()) {
+            $this->table('user')
+                ->insert([
+                    ['id' => 0, 'email_address' => 'unknown@user', 'forename' => 'Unknown', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => ''],
+                    ['id' => 1, 'email_address' => 'system@user', 'forename' => 'System', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => ''],
+                ])->saveData();
+        }
     }
 }

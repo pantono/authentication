@@ -162,6 +162,11 @@ class User implements UserInterface
         $this->groups = $groups;
     }
 
+    public function hasGroup(string $name): bool
+    {
+        return in_array($name, $this->getGroupNames());
+    }
+
     public function getPermissions(): array
     {
         return $this->permissions;
@@ -190,5 +195,24 @@ class User implements UserInterface
     public function setFields(array $fields): void
     {
         $this->fields = $fields;
+    }
+
+    public function getFlatFields(): array
+    {
+        $fields = [];
+        foreach ($this->getFields() as $field) {
+            $fields[$field->getType()->getName()] = $field->getCastedValue();
+        }
+        return $fields;
+    }
+
+    public function getFieldByName(string $name): mixed
+    {
+        foreach ($this->getFields() as $field) {
+            if ($field->getType()->getName() === $name) {
+                return $field->getCastedValue();
+            }
+        }
+        return null;
     }
 }

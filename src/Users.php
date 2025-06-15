@@ -22,6 +22,9 @@ class Users
     private Hydrator $hydrator;
     private EventDispatcher $dispatcher;
 
+    public const SYSTEM_USER_ID = 1;
+    public const UNKNOWN_USER_ID = 0;
+
     public function __construct(UsersRepository $repository, Hydrator $hydrator, EventDispatcher $dispatcher)
     {
         $this->repository = $repository;
@@ -90,5 +93,17 @@ class Users
     public function getUsersByFilter(UserFilter $filter): array
     {
         return $this->hydrator->hydrateSet(User::class, $this->repository->getUsersByFilter($filter));
+    }
+
+    public function addHistoryForUser(User $user, string $entry, ?User $byUser = null): void
+    {
+        if (!$byUser) {
+            if (php_sapi_name() == 'cli') {
+                $byUser = $this->getUserById(self::SYSTEM_USER_ID);
+            } else {
+                $byUser = $this->getUserById(self::UNKNOWN_USER_ID);
+            }
+        }
+        $this->repository->addHistoryForUser($user, $entry, $byUser);
     }
 }

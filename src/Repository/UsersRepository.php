@@ -37,11 +37,21 @@ class UsersRepository extends MysqlRepository
         return $this->getDb()->fetchAll($select);
     }
 
-    public function saveUser(UserInterface $user): void
+    public function saveUser(User $user): void
     {
         $id = $this->insertOrUpdate('user', 'id', $user->getId(), $user->getAllData());
         if ($id) {
             $user->setId($id);
+        }
+
+        $this->getDb()->delete('user_group', ['user_id=?' => $user->getId()]);
+        foreach ($user->getGroups() as $group) {
+            $this->getDb()->insert('user_group', ['user_id' => $user->getId(), 'group_id' => $group->getId()]);
+        }
+
+        $this->getDb()->delete('user_permission', ['user_id=?' => $user->getId()]);
+        foreach ($user->getPermissions() as $permission) {
+            $this->getDb()->insert('user_permission', ['user_id' => $user->getId(), 'permission_id' => $permission->getId()]);
         }
     }
 
@@ -109,6 +119,16 @@ class UsersRepository extends MysqlRepository
         $select->limitPage($filter->getPage(), $filter->getPerPage());
 
         return $this->getDb()->fetchAll($select);
+    }
+
+    public function addHistoryForUser(User $user, string $entry, User $byUser): void
+    {
+        $this->getDb()->insert('user_history', [
+            'target_user_id' => $user->getId(),
+            'date' => (new \DateTime())->format('Y-m-d H:i:s'),
+            'entry' => $entry,
+            'by_user_id' => $byUser->getId()
+        ]);
     }
 
 }
