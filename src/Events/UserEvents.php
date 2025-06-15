@@ -7,23 +7,27 @@ use Pantono\Authentication\Users;
 use Pantono\Authentication\Event\PostUserSaveEvent;
 use Pantono\Contracts\Security\SecurityContextInterface;
 use Pantono\Authentication\Model\User;
+use Pantono\Queue\QueueManager;
 
 class UserEvents implements EventSubscriberInterface
 {
     private Users $users;
     private SecurityContextInterface $securityContext;
+    private QueueManager $queueManager;
 
-    public function __construct(Users $users, SecurityContextInterface $securityContext)
+    public function __construct(Users $users, SecurityContextInterface $securityContext, QueueManager $queueManager)
     {
         $this->users = $users;
         $this->securityContext = $securityContext;
+        $this->queueManager = $queueManager;
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             PostUserSaveEvent::class => [
-                ['saveHistory', -255]
+                ['saveHistory', -255],
+                ['createQueueTask', -255]
             ]
         ];
     }
@@ -80,8 +84,19 @@ class UserEvents implements EventSubscriberInterface
         }
     }
 
+
+    public function createQueueTask(PostUserSaveEvent $event): void
+    {
+        if ($event->getPrevious() === null) {
+            $this->queueManager->createTask('user_create', ['user' => $event->getCurrent()->getAllData()]);
+            return;
+        }
+        $this->queueManager->createTask('user_update', ['user' => $event->getCurrent()->getAllData(), 'previous' => $event->getPrevious()->getAllData()]);
+    }
+
     public function getLoggedInUser(): ?User
     {
         return $this->securityContext->get('user');
     }
+
 }
