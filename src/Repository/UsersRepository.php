@@ -131,4 +131,9 @@ class UsersRepository extends MysqlRepository
         ]);
     }
 
+    public function getAllGroups(): array
+    {
+        return $this->selectAll('group', 'name ASC');
+    }
+
 }

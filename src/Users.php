@@ -109,4 +109,20 @@ class Users
         }
         $this->repository->addHistoryForUser($user, $entry, $byUser);
     }
+
+    /**
+     * @return Permission[]
+     */
+    public function getAllPermissions(): array
+    {
+        return $this->hydrator->hydrateSet(Permission::class, $this->repository->getAllPermissions());
+    }
+
+    /**
+     * @return Group[]
+     */
+    public function getAllGroups(): array
+    {
+        return $this->hydrator->hydrateSet(Group::class, $this->repository->getAllGroups());
+    }
 }
