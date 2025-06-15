@@ -75,6 +75,7 @@ class UserAuthenticationRepository extends MysqlRepository
     {
         $this->getDb()->insert('authentication_log', [
             'provider_id' => $provider->getId(),
+            'date' => (new \DateTime())->format('Y-m-d H:i:s'),
             'entry' => $entry,
             'ip_address' => $ipAddress,
             'user_id' => $userId,
