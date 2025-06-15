@@ -97,11 +97,14 @@ class Users
 
     public function addHistoryForUser(User $user, string $entry, ?User $byUser = null): void
     {
-        if (!$byUser) {
+        if ($byUser === null) {
             if (php_sapi_name() == 'cli') {
                 $byUser = $this->getUserById(self::SYSTEM_USER_ID);
             } else {
                 $byUser = $this->getUserById(self::UNKNOWN_USER_ID);
+            }
+            if ($byUser === null) {
+                throw new \RuntimeException('Unable to find system user');
             }
         }
         $this->repository->addHistoryForUser($user, $entry, $byUser);

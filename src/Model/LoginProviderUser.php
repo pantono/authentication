@@ -23,6 +23,9 @@ class LoginProviderUser
     private \DateTimeInterface $tokenExpires;
     private \DateTimeInterface $dateConnected;
     private ?\DateTimeInterface $lastUsed = null;
+    /**
+     * @var array<string,mixed>
+     */
     #[Filter('json_decode')]
     private array $values = [];
 

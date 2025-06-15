@@ -86,7 +86,8 @@ class GoogleAuthProvider extends AbstractAuthenticationProvider
         $token = $this->getTokenFromOptions($options);
         $resource = $this->getGoogleClient()->getResourceOwner($token);
         $user = new User();
-        $user->setDateCreated(new \DateTime);
+        $user->setDateCreated(new \DateTimeImmutable);
+        $user->setPassword('');
         foreach ($resource->toArray() as $key => $value) {
             if ($key === 'email') {
                 $user->setEmailAddress($value);
