@@ -34,8 +34,7 @@ class ValidApiTokenTest extends TestCase
         $request = new Request([], [], [], [], [], ['HTTP_ApiKey' => 'test']);
         $expected = new ApiToken();
         $expected->setId(1);
-        $expected->setExpiry(new \DateTime('+2 year'));
-        $expected->setCompany('test');
+        $expected->setDateExpires((new \DateTime('+2 year')));
         $this->apiAuthentication->expects($this->once())
             ->method('getApiTokenByToken')
             ->with('test')
@@ -51,8 +50,7 @@ class ValidApiTokenTest extends TestCase
         $request = new Request([], [], [], [], [], ['HTTP_ApiKey' => 'test']);
         $expected = new ApiToken();
         $expected->setId(1);
-        $expected->setExpiry(new \DateTime('-2 year'));
-        $expected->setCompany('test');
+        $expected->setDateExpires(new \DateTime('-2 year'));
         $this->apiAuthentication->expects($this->once())
             ->method('getApiTokenByToken')
             ->with('test')

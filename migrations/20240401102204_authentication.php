@@ -27,6 +27,7 @@ final class Authentication extends AbstractMigration
             ->addColumn('password', 'string')
             ->addColumn('deleted', 'boolean')
             ->addColumn('disabled', 'boolean')
+            ->addColumn('tfa_enabled', 'boolean')
             ->addIndex(['email_address'], ['unique' => true])
             ->create();
 
@@ -161,5 +162,50 @@ final class Authentication extends AbstractMigration
                     ['id' => 1, 'email_address' => 'system@user', 'forename' => 'System', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => ''],
                 ])->saveData();
         }
+
+        $this->table('tfa_type')
+            ->addColumn('name', 'string')
+            ->addColumn('description', 'string')
+            ->addColumn('enabled', 'boolean', ['default' => 0])
+            ->addColumn('controller', 'string')
+            ->addColumn('config', 'json', ['null' => true])
+            ->create();
+        if ($this->isMigratingUp()) {
+            $this->table('tfa_type')
+                ->insert([
+                    ['id' => 1, 'name' => 'Email', 'description' => 'An e-mail sent to your inbox', 'enabled' => 1, 'controller' => 'Pantono\Authentication\Provider\Tfa\EmailTfaController', 'config' => json_encode(['email_copy' => '<p>Your code is {code}</p>', 'verification_required' => false, 'custom_email' => false, 'email_verification_copy' => '<p>Click this link {link} to verify your e-mail</p>'])],
+                    ['id' => 2, 'name' => 'SMS', 'description' => 'An SMS sent to your mobile phone', 'enabled' => 0, 'controller' => 'Pantono\Authentication\Provider\Tfa\SmsTfaController', 'config' => json_encode(['verification_required' => true, 'sid' => '', 'token' => '', 'from_number' => ''])],
+                    ['id' => 3, 'name' => 'TOTP', 'description' => 'A time-based one-time password', 'enabled' => 0, 'controller' => 'Pantono\Authentication\Provider\Tfa\TotpTfaController', 'config' => json_encode(['qr_label' => 'Pantono'])],
+                ])->save();
+        }
+
+        $this->table('user_tfa_method')
+            ->addColumn('date_created', 'datetime')
+            ->addColumn('date_last_used', 'datetime', ['null' => true])
+            ->addColumn('user_id', 'integer', ['signed' => false])
+            ->addColumn('type_id', 'integer', ['signed' => false])
+            ->addColumn('config', 'json')
+            ->addColumn('enabled', 'boolean', ['default' => 1])
+            ->addColumn('verified', 'boolean', ['default' => 0])
+            ->addColumn('deleted', 'boolean')
+            ->addForeignKey('user_id', 'user', 'id')
+            ->addForeignKey('type_id', 'tfa_type', 'id')
+            ->create();
+
+        $this->table('user_tfa_attempt')
+            ->addColumn('method_id', 'integer', ['signed' => false])
+            ->addColumn('date_created', 'datetime')
+            ->addColumn('date_expires', 'datetime')
+            ->addColumn('attempt_code', 'string')
+            ->addColumn('attempt_secret', 'string')
+            ->addColumn('verified', 'boolean', ['default' => 0])
+            ->addForeignKey('method_id', 'user_tfa_method', 'id')
+            ->create();
+
+        $this->table('user_tfa_attempt_log')
+            ->addColumn('attempt_id', 'integer', ['signed' => false])
+            ->addColumn('date', 'datetime')
+            ->addColumn('entry', 'string')
+            ->create();
     }
 }

@@ -44,13 +44,12 @@ class ValidUserTokenTest extends TestCase
         $request = new Request([], [], [], [], [], ['HTTP_UserToken' => 'test']);
         $token = new UserToken();
         $user = new User();
-        $user->setSuspendedUser(false);
         $user->setId(1);
         $token->setUser($user);
         $token->setId(1);
         $token->setDateExpires(new \DateTime('+1 hour'));
         $token->setApiTokenId(1);
-        $this->securityContext->expects($this->exactly(3))
+        $this->securityContext->expects($this->exactly(2))
             ->method('set');
         $token->setDateCreated(new \DateTime("-1 hour"));
         $this->userAuthentication->expects($this->once())
@@ -70,13 +69,12 @@ class ValidUserTokenTest extends TestCase
             ->willReturn('TEST TOKEN STRING');
         $token = new UserToken();
         $user = new User();
-        $user->setSuspendedUser(false);
         $user->setId(1);
         $token->setUser($user);
         $token->setId(1);
         $token->setDateExpires(new \DateTime('+1 hour'));
         $token->setApiTokenId(1);
-        $this->securityContext->expects($this->exactly(3))
+        $this->securityContext->expects($this->exactly(2))
             ->method('set');
         $token->setDateCreated(new \DateTime("-1 hour"));
         $this->userAuthentication->expects($this->once())
@@ -92,7 +90,6 @@ class ValidUserTokenTest extends TestCase
         $request = new Request([], [], [], [], [], ['HTTP_UserToken' => 'test']);
         $token = new UserToken();
         $user = new User();
-        $user->setSuspendedUser(false);
         $user->setId(1);
         $token->setUser($user);
         $token->setId(1);
@@ -102,28 +99,6 @@ class ValidUserTokenTest extends TestCase
 
         $this->expectExceptionCode(401);
         $this->expectExceptionMessage('You have been logged out');
-        $this->userAuthentication->expects($this->once())
-            ->method('getUserTokenByToken')
-            ->willReturn($token);
-        $validator->isValid($request, $this->getEndpointMock(), new ParameterBag(), $this->getSessionMock());
-    }
-
-    public function testSuspendedUser()
-    {
-        $validator = new ValidUserToken($this->userAuthentication, $this->securityContext, $this->eventDispatcher);
-        $request = new Request([], [], [], [], [], ['HTTP_UserToken' => 'test']);
-        $token = new UserToken();
-        $user = new User();
-        $user->setSuspendedUser(true);
-        $user->setId(1);
-        $token->setUser($user);
-        $token->setId(1);
-        $token->setDateExpires(new \DateTime('+1 hour'));
-        $token->setApiTokenId(1);
-        $token->setDateCreated(new \DateTime("-1 hour"));
-
-        $this->expectExceptionCode(401);
-        $this->expectExceptionMessage('Your PartyPro Account has been suspended');
         $this->userAuthentication->expects($this->once())
             ->method('getUserTokenByToken')
             ->willReturn($token);

@@ -14,6 +14,8 @@ use Pantono\Hydrator\Locator\StaticLocator;
 use Pantono\Utilities\RequestHelper;
 use Pantono\Authentication\Model\LoginProviderType;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Pantono\Authentication\Exception\TwoFactorAuthRequired;
+use Pantono\Authentication\Model\UserTfaAttempt;
 
 class UserAuthentication
 {
@@ -40,11 +42,20 @@ class UserAuthentication
         return $this->hydrator->hydrate(LoginProviderType::class, $this->repository->getProviderTypeById($id));
     }
 
-    public function addSuccessfulLoginForUser(User $user, LoginProvider $provider): void
+    public function addSuccessfulLoginForUser(User $user, LoginProvider $provider, ?UserTfaAttempt $twoFactorAuthAttempt = null): void
     {
-        $this->session->set('user_id', $user->getId());
+        $isTfa = $twoFactorAuthAttempt && $twoFactorAuthAttempt->isVerified();
         $this->session->set('login_provider', $provider->getId());
-        $this->addLogForProvider($provider, 'Successful login', $user->getId());
+        if ($user->isTfaEnabled() && !$isTfa) {
+            $this->session->set('tfa_user_id', $user->getId());
+            $this->addLogForProvider($provider, 'First stage login completed, Two factor auth required', $user->getId());
+            throw new TwoFactorAuthRequired('Two factor auth is required to continue');
+        }
+        $this->session->set('user_id', $user->getId());
+        if ($isTfa) {
+            $this->addLogForProvider($provider, 'Successfully logged in with two factor auth');
+        }
+        $this->addLogForProvider($provider, 'Successfully logged in', $user->getId());
     }
 
     public function processLogout(): void
@@ -135,5 +146,13 @@ class UserAuthentication
     {
         $ipAddress = RequestHelper::getIp();
         $this->repository->addLogForProvider($provider, $entry, $ipAddress, $userId, $sessionId, $data);
+    }
+
+    public function getProviderFromSession(): ?LoginProvider
+    {
+        if ($this->session->has('login_provider') === false) {
+            return null;
+        }
+        return $this->getLoginProviderById($this->session->get('login_provider'));
     }
 }

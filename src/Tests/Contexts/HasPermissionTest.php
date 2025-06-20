@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Pantono\Authentication\Exception\AccessDeniedException;
 use RuntimeException;
+use Pantono\Authentication\Model\Permission;
 
 class HasPermissionTest extends TestCase
 {
@@ -40,7 +41,7 @@ class HasPermissionTest extends TestCase
     public function testInValidPermission()
     {
         $user = new User();
-        $user->setPermissions(['test' => false]);
+        $user->setPermissions([]);
         $this->securityContext->expects($this->once())
             ->method('get')
             ->with('user')

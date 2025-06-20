@@ -39,6 +39,7 @@ class User implements UserInterface
      */
     #[Locator(methodName: 'getFieldsForUser', className: Users::class), FieldName('$this')]
     private array $fields = [];
+    private bool $tfaEnabled = false;
 
     public function getId(): ?int
     {
@@ -214,5 +215,15 @@ class User implements UserInterface
             }
         }
         return null;
+    }
+
+    public function isTfaEnabled(): bool
+    {
+        return $this->tfaEnabled;
+    }
+
+    public function setTfaEnabled(bool $tfaEnabled): void
+    {
+        $this->tfaEnabled = $tfaEnabled;
     }
 }
