@@ -158,8 +158,8 @@ final class Authentication extends AbstractMigration
         if ($this->isMigratingUp()) {
             $this->table('user')
                 ->insert([
-                    ['id' => 0, 'email_address' => 'unknown@user', 'forename' => 'Unknown', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => ''],
-                    ['id' => 1, 'email_address' => 'system@user', 'forename' => 'System', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => ''],
+                    ['id' => 1, 'email_address' => 'unknown@user', 'forename' => 'Unknown', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => ''],
+                    ['id' => 2, 'email_address' => 'system@user', 'forename' => 'System', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => ''],
                 ])->saveData();
         }
 
