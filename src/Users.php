@@ -15,6 +15,9 @@ use Pantono\Authentication\Model\UserFieldType;
 use Pantono\Authentication\Event\PreUserSaveEvent;
 use Pantono\Authentication\Event\PostUserSaveEvent;
 use Pantono\Authentication\Filter\UserFilter;
+use Symfony\Component\HttpFoundation\ParameterBag;
+use Pantono\Authentication\Exception\UserCreateException;
+use Pantono\Authentication\Exception\RequiredFieldAlreadyExists;
 
 class Users
 {
@@ -43,6 +46,30 @@ class Users
     public function getGroupById(int $id): ?Group
     {
         return $this->hydrator->hydrate(Group::class, $this->repository->getGroupById($id));
+    }
+
+    public function createUser(array $data): User
+    {
+        $parameters = new ParameterBag($data);
+        $required = ['forename', 'surname', 'email_address'];
+        $user = new User();
+        foreach ($required as $field) {
+            if ($parameters->has($field) === false) {
+                throw new RequiredFieldAlreadyExists('Missing required field ' . $field);
+            }
+        }
+        $user->setDateCreated(new \DateTime);
+        $user->setDeleted(false);
+        $user->setVerified(false);
+        $user->setDisabled(false);
+        $user->setForename($parameters->get('forename'));
+        $user->setSurname($parameters->get('surname'));
+        $user->setEmailAddress($parameters->get('email_address'));
+        if ($parameters->has('password')) {
+            $user->setPassword(password_hash($parameters->get('password'), PASSWORD_DEFAULT));
+        }
+        $this->saveUser($user);
+        return $user;
     }
 
     public function saveUser(User $user): void

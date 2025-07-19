@@ -8,18 +8,23 @@ use Pantono\Authentication\Event\PostUserSaveEvent;
 use Pantono\Contracts\Security\SecurityContextInterface;
 use Pantono\Authentication\Model\User;
 use Pantono\Queue\QueueManager;
+use Pantono\Authentication\Event\PreUserSaveEvent;
+use Pantono\Email\Email;
+use Pantono\Utilities\StringUtilities;
 
 class UserEvents implements EventSubscriberInterface
 {
     private Users $users;
     private SecurityContextInterface $securityContext;
     private QueueManager $queueManager;
+    private Email $email;
 
-    public function __construct(Users $users, SecurityContextInterface $securityContext, QueueManager $queueManager)
+    public function __construct(Users $users, SecurityContextInterface $securityContext, QueueManager $queueManager, Email $email)
     {
         $this->users = $users;
         $this->securityContext = $securityContext;
         $this->queueManager = $queueManager;
+        $this->email = $email;
     }
 
     public static function getSubscribedEvents(): array
@@ -28,8 +33,27 @@ class UserEvents implements EventSubscriberInterface
             PostUserSaveEvent::class => [
                 ['saveHistory', -255],
                 ['createQueueTask', -255]
+            ],
+            PreUserSaveEvent::class => [
+                ['checkPassword', 255]
             ]
         ];
+    }
+
+    public function checkPassword(PreUserSaveEvent $event): void
+    {
+        if (!$event->getPrevious() && !$event->getCurrent()->getPassword()) {
+            $message = $this->email->createMessageForType('new_password');
+            if ($message) {
+                $password = StringUtilities::generateRandomString(10);
+                $event->getCurrent()->setPassword(password_hash($password, PASSWORD_DEFAULT));
+                $message->setVariables(['user' => $event->getCurrent(), 'password' => $password])
+                    ->subject('Your new password')
+                    ->to($event->getCurrent()->getEmailAddress(), $event->getCurrent()->getForename() . ' ' . $event->getCurrent()->getSurname());
+
+                $message->send();
+            }
+        }
     }
 
     public function saveHistory(PostUserSaveEvent $event): void
