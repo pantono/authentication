@@ -38,7 +38,7 @@ class EmailTfaProvider extends AbstractTwoFactorAuthProvider
         $this->auth->saveAttempt($attempt);
 
         if (!$method->getUser()) {
-            throw new \RuntimeException('Invalid TOTP setup detected');
+            throw new \RuntimeException('Invalid TFA setup detected');
         }
         $toAddress = $method->getUser()->getEmailAddress();
         if ($method->getTfaType()->getConfigField('custom_email') === true) {
