@@ -88,4 +88,14 @@ class UserAuthenticationRepository extends MysqlRepository
     {
         return $this->selectSingleRow('login_provider_type', 'id', $id);
     }
+
+    public function getUserTokenById(int $id): ?array
+    {
+        return $this->selectSingleRow('user_token', 'id', $id);
+    }
+
+    public function getLoginProviderUserById(int $id): ?array
+    {
+        return $this->selectSingleRow('login_provider_user', 'id', $id);
+    }
 }

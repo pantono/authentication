@@ -10,6 +10,7 @@ use Pantono\Authentication\UserAuthentication;
 use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Authentication\Users;
 
+#[Locator(serviceName: UserAuthentication::class, methodName: 'getUserById')]
 class User implements UserInterface
 {
     use SavableModel;

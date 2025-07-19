@@ -48,6 +48,11 @@ class TwoFactorAuth
         return $this->hydrator->hydrateSet(UserTfaMethod::class, $this->repository->getMethodsForUser($user));
     }
 
+    public function getUserMethodById(int $id): ?UserTfaMethod
+    {
+        return $this->hydrator->hydrate(UserTfaMethod::class, $this->repository->getUserMethodById($id));
+    }
+
     public function saveMethod(UserTfaMethod $method): void
     {
         $this->repository->saveUserTfaMethod($method);

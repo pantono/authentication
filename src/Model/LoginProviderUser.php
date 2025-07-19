@@ -9,6 +9,7 @@ use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Database\Traits\SavableModel;
 use Pantono\Contracts\Attributes\Filter;
 
+#[Locator(methodName: 'getLoginProviderUserById', className: UserAuthentication::class)]
 class LoginProviderUser
 {
     use SavableModel;

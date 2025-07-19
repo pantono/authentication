@@ -7,7 +7,9 @@ use Pantono\Contracts\Attributes\Locator;
 use Pantono\Authentication\Users;
 use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Contracts\Attributes\Lazy;
+use Pantono\Authentication\TwoFactorAuth;
 
+#[Locator(methodName: 'getUserMethodById', className: TwoFactorAuth::class)]
 class UserTfaMethod
 {
     use SavableModel;

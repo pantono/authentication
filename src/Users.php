@@ -40,6 +40,11 @@ class Users
         return $this->hydrator->hydrateSet(Group::class, $this->repository->getGroupsForUser($user));
     }
 
+    public function getGroupById(int $id): ?Group
+    {
+        return $this->hydrator->hydrate(Group::class, $this->repository->getGroupById($id));
+    }
+
     public function saveUser(User $user): void
     {
         $previous = $user->getId() ? $this->getUserById($user->getId()) : null;
@@ -62,6 +67,11 @@ class Users
     public function getPermissionsForUser(User $user): array
     {
         return $this->repository->getPermissionsForUser($user);
+    }
+
+    public function getPermissionById(int $id): ?Permission
+    {
+        return $this->hydrator->hydrate(Permission::class, $this->repository->getPermissionById($id));
     }
 
     public function getUserById(int $id): ?User

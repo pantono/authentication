@@ -3,7 +3,10 @@
 namespace Pantono\Authentication\Model;
 
 use Pantono\Database\Traits\SavableModel;
+use Pantono\Contracts\Attributes\Locator;
+use Pantono\Authentication\TwoFactorAuth;
 
+#[Locator(methodName: 'getAttemptById', className: TwoFactorAuth::class)]
 class UserTfaAttempt
 {
     use SavableModel;

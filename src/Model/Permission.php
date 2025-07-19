@@ -2,6 +2,10 @@
 
 namespace Pantono\Authentication\Model;
 
+use Pantono\Contracts\Attributes\Locator;
+use Pantono\Authentication\Users;
+
+#[Locator(methodName: 'getPermissionById', className: Users::class)]
 class Permission
 {
     private ?int $id = null;

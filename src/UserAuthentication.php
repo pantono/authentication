@@ -32,6 +32,11 @@ class UserAuthentication
         $this->session = $session;
     }
 
+    public function getUserTokenById(int $id): ?UserToken
+    {
+        return $this->hydrator->hydrate(UserToken::class, $this->repository->getUserTokenById($id));
+    }
+
     public function getUserTokenByToken(string $token): ?UserToken
     {
         return $this->hydrator->hydrate(UserToken::class, $this->repository->getUserTokenByToken($token));
@@ -154,5 +159,10 @@ class UserAuthentication
             return null;
         }
         return $this->getLoginProviderById($this->session->get('login_provider'));
+    }
+
+    public function getLoginProviderUserById(int $id): ?LoginProviderUser
+    {
+        return $this->hydrator->hydrate(LoginProviderUser::class, $this->repository->getLoginProviderUserById($id));
     }
 }

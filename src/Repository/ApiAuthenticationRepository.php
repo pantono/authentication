@@ -24,4 +24,9 @@ class ApiAuthenticationRepository extends MysqlRepository
             $token->setId($id);
         }
     }
+
+    public function getTokenById(int $id): ?array
+    {
+        return $this->selectSingleRow('api_token', 'id', $id);
+    }
 }

@@ -136,4 +136,14 @@ class UsersRepository extends MysqlRepository
         return $this->selectAll('group', 'name ASC');
     }
 
+    public function getGroupById(int $id): ?array
+    {
+        return $this->selectSingleRow('user', 'id', $id);
+    }
+
+    public function getPermissionById(int $id): ?array
+    {
+        return $this->selectSingleRow('permission', 'id', $id);
+    }
+
 }

@@ -23,6 +23,11 @@ class ApiAuthentication
         return $this->hydrator->hydrate(ApiToken::class, $this->repository->getApiTokenByToken($token));
     }
 
+    public function getApiTokenById(int $id): ?ApiToken
+    {
+        return $this->hydrator->hydrate(ApiToken::class, $this->repository->getTokenById($id));
+    }
+
     public function updateApiTokenLastSeen(ApiToken $token): void
     {
         $this->repository->updateApiTokenLastSeen($token);

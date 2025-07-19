@@ -53,4 +53,9 @@ class TwoFactorAuthRepository extends MysqlRepository
             'entry' => $entry
         ]);
     }
+
+    public function getUserMethodById(int $id): ?array
+    {
+        return $this->selectSingleRow('user_tfa_method', 'id', $id);
+    }
 }

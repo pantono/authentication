@@ -3,7 +3,10 @@
 namespace Pantono\Authentication\Model;
 
 use Pantono\Database\Traits\SavableModel;
+use Pantono\Contracts\Attributes\Locator;
+use Pantono\Authentication\ApiAuthentication;
 
+#[Locator(methodName: 'getTokenById', className: ApiAuthentication::class)]
 class ApiToken
 {
     use SavableModel;
