@@ -28,6 +28,7 @@ final class Authentication extends AbstractMigration
             ->addColumn('deleted', 'boolean')
             ->addColumn('disabled', 'boolean')
             ->addColumn('tfa_enabled', 'boolean')
+            ->addColumn('system_user', 'boolean', ['default' => 0])
             ->addIndex(['email_address'], ['unique' => true])
             ->create();
 
@@ -158,8 +159,8 @@ final class Authentication extends AbstractMigration
         if ($this->isMigratingUp()) {
             $this->table('user')
                 ->insert([
-                    ['id' => 1, 'email_address' => 'unknown@user', 'forename' => 'Unknown', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => ''],
-                    ['id' => 2, 'email_address' => 'system@user', 'forename' => 'System', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => ''],
+                    ['id' => 1, 'email_address' => 'unknown@user', 'forename' => 'Unknown', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => '', 'system_user' => 1],
+                    ['id' => 2, 'email_address' => 'system@user', 'forename' => 'System', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => '', 'system_user' => 1],
                 ])->saveData();
         }
 
