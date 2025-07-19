@@ -44,9 +44,9 @@ class UserEvents implements EventSubscriberInterface
     {
         if (!$event->getPrevious() && !$event->getCurrent()->getPassword()) {
             $message = $this->email->createMessageForType('new_password');
+            $password = StringUtilities::generateRandomString(10);
+            $event->getCurrent()->setPassword(password_hash($password, PASSWORD_DEFAULT));
             if ($message) {
-                $password = StringUtilities::generateRandomString(10);
-                $event->getCurrent()->setPassword(password_hash($password, PASSWORD_DEFAULT));
                 $message->setVariables(['user' => $event->getCurrent(), 'password' => $password])
                     ->subject('Your new password')
                     ->to($event->getCurrent()->getEmailAddress(), $event->getCurrent()->getForename() . ' ' . $event->getCurrent()->getSurname());
