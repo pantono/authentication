@@ -25,8 +25,8 @@ class Users
     private Hydrator $hydrator;
     private EventDispatcher $dispatcher;
 
-    public const SYSTEM_USER_ID = 1;
-    public const UNKNOWN_USER_ID = 0;
+    public const SYSTEM_USER_ID = 2;
+    public const UNKNOWN_USER_ID = 1;
 
     public function __construct(UsersRepository $repository, Hydrator $hydrator, EventDispatcher $dispatcher)
     {
