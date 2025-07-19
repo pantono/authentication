@@ -22,7 +22,7 @@ class User implements UserInterface
     private string $emailAddress;
     private string $forename;
     private string $surname;
-    private string $password;
+    private ?string $password = null;
     private bool $deleted;
     private bool $disabled;
     /**
@@ -104,12 +104,12 @@ class User implements UserInterface
         $this->surname = $surname;
     }
 
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    public function setPassword(string $password): void
+    public function setPassword(?string $password): void
     {
         $this->password = $password;
     }
