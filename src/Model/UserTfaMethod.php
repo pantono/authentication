@@ -18,7 +18,7 @@ class UserTfaMethod
     private \DateTimeInterface $dateCreated;
     private ?\DateTimeInterface $dateLastUsed = null;
     private int $userId;
-    #[Locator(serviceName: Users::class, methodName: 'getUserById'), FieldName('user_id'), Lazy]
+    #[Locator(methodName: 'getUserById', className: Users::class), FieldName('user_id'), Lazy]
     private ?User $user = null;
     private TfaType $tfaType;
     /**
