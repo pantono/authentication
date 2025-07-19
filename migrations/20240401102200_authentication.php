@@ -29,6 +29,7 @@ final class Authentication extends AbstractMigration
             ->addColumn('disabled', 'boolean')
             ->addColumn('tfa_enabled', 'boolean')
             ->addColumn('system_user', 'boolean', ['default' => 0])
+            ->addColumn('verified', 'boolean', ['default' => 0])
             ->addIndex(['email_address'], ['unique' => true])
             ->create();
 
@@ -207,6 +208,43 @@ final class Authentication extends AbstractMigration
             ->addColumn('attempt_id', 'integer', ['signed' => false])
             ->addColumn('date', 'datetime')
             ->addColumn('entry', 'string')
+            ->create();
+
+        $this->table('user_verification_type')
+            ->addColumn('name', 'string')
+            ->addColumn('enabled', 'boolean')
+            ->addColumn('controller', 'string')
+            ->create();
+
+        if ($this->isMigratingUp()) {
+            $this->table('user_verification_type')
+                ->insert([
+                    ['id' => 1, 'name' => 'Email', 'enabled' => 1, 'controller' => 'Pantono\Authentication\VerificationController\EmailVerificationController'],
+                    ['id' => 2, 'name' => 'SMS', 'enabled' => 0, 'controller' => 'Pantono\Authentication\VerificationController\SmsVerificationController'],
+                    ['id' => 3, 'name' => 'WhatsApp', 'enabled' => 0, 'controller' => 'Pantono\Authentication\VerificationController\WhatsAppVerificationController'],
+                ])->saveData();
+        }
+
+        $this->table('user_verification')
+            ->addColumn('user_id', 'integer', ['signed' => false])
+            ->addColumn('type_id', 'integer', ['signed' => false])
+            ->addColumn('token', 'string')
+            ->addColumn('code', 'string')
+            ->addColumn('credential', 'string')
+            ->addColumn('date_created', 'datetime')
+            ->addColumn('date_expires', 'datetime')
+            ->addColumn('verified', 'boolean', ['default' => 0])
+            ->addForeignKey('user_id', 'user', 'id')
+            ->addForeignKey('type_id', 'user_verification_type', 'id')
+            ->addIndex('code')
+            ->addIndex('token')
+            ->create();
+
+        $this->table('user_verification_log')
+            ->addColumn('verification_id', 'integer', ['signed' => false])
+            ->addColumn('date', 'datetime')
+            ->addColumn('entry', 'string')
+            ->addForeignKey('verification_id', 'user_verification', 'id')
             ->create();
     }
 }

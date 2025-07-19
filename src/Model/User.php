@@ -42,6 +42,7 @@ class User implements UserInterface
     private array $fields = [];
     private bool $tfaEnabled = false;
     private bool $systemUser = false;
+    private bool $verified = false;
 
     public function getId(): ?int
     {
@@ -237,5 +238,15 @@ class User implements UserInterface
     public function setSystemUser(bool $systemUser): void
     {
         $this->systemUser = $systemUser;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->verified;
+    }
+
+    public function setVerified(bool $verified): void
+    {
+        $this->verified = $verified;
     }
 }
