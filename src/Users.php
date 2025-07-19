@@ -66,6 +66,7 @@ class Users
         $user->setSurname($parameters->get('surname'));
         $user->setEmailAddress($parameters->get('email_address'));
         $user->setPermissions([]);
+        $user->setGroups([]);
         if ($parameters->has('password')) {
             $user->setPassword(password_hash($parameters->get('password'), PASSWORD_DEFAULT));
         }
