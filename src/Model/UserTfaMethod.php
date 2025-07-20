@@ -20,7 +20,8 @@ class UserTfaMethod
     private int $userId;
     #[Locator(methodName: 'getUserById', className: Users::class), FieldName('user_id'), Lazy]
     private ?User $user = null;
-    private TfaType $tfaType;
+    #[Locator(methodName: 'getTypeById', className: TwoFactorAuth::class), FieldName('type_id')]
+    private ?TfaType $tfaType = null;
     /**
      * @var array<string,mixed>
      */
@@ -79,12 +80,12 @@ class UserTfaMethod
         $this->user = $user;
     }
 
-    public function getTfaType(): TfaType
+    public function getTfaType(): ?TfaType
     {
         return $this->tfaType;
     }
 
-    public function setTfaType(TfaType $tfaType): void
+    public function setTfaType(?TfaType $tfaType): void
     {
         $this->tfaType = $tfaType;
     }

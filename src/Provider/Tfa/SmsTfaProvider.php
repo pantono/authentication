@@ -27,6 +27,9 @@ class SmsTfaProvider extends AbstractTwoFactorAuthProvider
         if (!$number) {
             throw new \RuntimeException('Phone number is required for SMS Two Factor Auth');
         }
+        if (!$method->getTfaType()) {
+            throw new \RuntimeException('TFA type is required for SMS Two Factor Auth');
+        }
         $this->auth->saveAttempt($attempt);
         if (!$fromNumber = $method->getTfaType()->getConfigField('from_number')) {
             throw new \RuntimeException('From number is required for SMS Two Factor Auth');
@@ -68,8 +71,8 @@ class SmsTfaProvider extends AbstractTwoFactorAuthProvider
         if ($type->getConfigField('verification_required') === false) {
             $method->setVerified(true);
         } else {
-            $this->createClient($method->getTfaType())->messages->create($type->getConfigField('from_number'), [
-                'from' => $method->getTfaType()->getConfigField('from_number'),
+            $this->createClient($type)->messages->create($type->getConfigField('from_number'), [
+                'from' => $type->getConfigField('from_number'),
                 'body' => 'Your verification code is ' . $config['setup_code']
             ]);
         }

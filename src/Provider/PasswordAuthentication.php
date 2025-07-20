@@ -10,6 +10,7 @@ use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Exception\EmailAlreadyExists;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Pantono\Hydrator\Locator\StaticLocator;
+use Pantono\Authentication\Exception\PasswordAuthNotAvailableException;
 
 class PasswordAuthentication extends AbstractAuthenticationProvider
 {
@@ -39,6 +40,9 @@ class PasswordAuthentication extends AbstractAuthenticationProvider
         if ($user === null) {
             $this->authentication->addLogForProvider($this->getProviderConfig(), 'User not found', null, $this->getSession()->getId(), ['username' => $username]);
             throw new UserDoesNotExistException('User does not exist');
+        }
+        if (!$user->getPassword()) {
+            throw new PasswordAuthNotAvailableException('Password authentication not available for this user');
         }
         if (password_verify($password, $user->getPassword()) === false) {
             $this->authentication->addLogForProvider($this->getProviderConfig(), 'User not found', $user->getId(), $this->getSession()->getId(), ['username' => $username]);

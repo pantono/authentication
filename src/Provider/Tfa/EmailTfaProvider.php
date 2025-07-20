@@ -25,6 +25,9 @@ class EmailTfaProvider extends AbstractTwoFactorAuthProvider
 
     public function initiate(UserTfaMethod $method): UserTfaAttempt
     {
+        if (!$method->getTfaType()) {
+            throw new \RuntimeException('TFA type is required for email Two Factor Auth');
+        }
         $attempt = $this->createAttempt($method);
         $expiryTimeStr = $method->getConfigField('expiry_time');
         if ($expiryTimeStr) {

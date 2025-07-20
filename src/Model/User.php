@@ -9,6 +9,7 @@ use Pantono\Contracts\Attributes\Locator;
 use Pantono\Authentication\UserAuthentication;
 use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Authentication\Users;
+use Pantono\Authentication\Exception\PasswordAuthNotAvailableException;
 
 #[Locator(methodName: 'getUserById', className: Users::class)]
 class User implements UserInterface
@@ -136,6 +137,9 @@ class User implements UserInterface
 
     public function authenticate(string $password): bool
     {
+        if (!$this->getPassword()) {
+            throw new PasswordAuthNotAvailableException('Password auth not available for this user');
+        }
         if (password_needs_rehash($this->getPassword(), PASSWORD_DEFAULT)) {
             throw new PasswordNeedsRehashException('Password needs rehashing');
         }
