@@ -58,7 +58,7 @@ class UserAuthentication
         }
         $this->session->set('user_id', $user->getId());
         if ($isTfa) {
-            $this->addLogForProvider($provider, 'Successfully logged in with two factor auth');
+            $this->addLogForProvider($provider, 'Successfully logged in with two factor auth', $user->getId(), $this->session->getId());
         }
         $this->addLogForProvider($provider, 'Successfully logged in', $user->getId(), $this->session->getId());
     }
