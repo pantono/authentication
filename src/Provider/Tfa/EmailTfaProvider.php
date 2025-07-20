@@ -8,19 +8,21 @@ use Pantono\Authentication\Model\UserTfaMethod;
 use Pantono\Authentication\Model\UserTfaAttempt;
 use Pantono\Utilities\StringUtilities;
 use DateTimeImmutable;
-use DateTime;
 use Pantono\Authentication\Model\TfaType;
 use Pantono\Authentication\Model\User;
+use Pantono\Email\EmailTemplates;
 
 class EmailTfaProvider extends AbstractTwoFactorAuthProvider
 {
     private Email $email;
     private TwoFactorAuth $auth;
+    private EmailTemplates $templates;
 
-    public function __construct(Email $email, TwoFactorAuth $auth)
+    public function __construct(Email $email, TwoFactorAuth $auth, EmailTemplates $templates)
     {
         $this->email = $email;
         $this->auth = $auth;
+        $this->templates = $templates;
     }
 
     public function initiate(UserTfaMethod $method): UserTfaAttempt
@@ -50,15 +52,14 @@ class EmailTfaProvider extends AbstractTwoFactorAuthProvider
             }
         }
 
-        $copy = $method->getTfaType()->getConfig()['email_copy'] ?? null;
-        if (!$copy) {
-            throw new \RuntimeException('Invalid config for email provider, missing copy');
+        $template = $this->templates->getTemplateForType('tfa');
+        if (!$template) {
+            throw new \RuntimeException('No e-mail template set for two factor auth');
         }
-        $message = $this->email->createMessage();
-        $message->to($toAddress, $method->getUser()->getName())->setRenderedHtml($copy)
-            ->subject('Your verification code is ' . $attempt->getAttemptCode());
-        $this->email->sendEmail($message);
-
+        $this->email->createMessage()->to($toAddress, $method->getUser()->getName())
+            ->addVariable('attempt', $attempt)
+            ->subject('Your verification code is ' . $attempt->getAttemptCode())
+            ->setTemplate($template)->send();
         $this->auth->addLogToAttempt($attempt, 'Email sent to ' . $toAddress);
 
         return $attempt;
