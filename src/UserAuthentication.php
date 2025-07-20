@@ -53,14 +53,14 @@ class UserAuthentication
         $this->session->set('login_provider', $provider->getId());
         if ($user->isTfaEnabled() && !$isTfa) {
             $this->session->set('tfa_user_id', $user->getId());
-            $this->addLogForProvider($provider, 'First stage login completed, Two factor auth required', $user->getId());
+            $this->addLogForProvider($provider, 'First stage login completed, Two factor auth required', $user->getId(), $this->session->getId());
             throw new TwoFactorAuthRequired('Two factor auth is required to continue');
         }
         $this->session->set('user_id', $user->getId());
         if ($isTfa) {
             $this->addLogForProvider($provider, 'Successfully logged in with two factor auth');
         }
-        $this->addLogForProvider($provider, 'Successfully logged in', $user->getId());
+        $this->addLogForProvider($provider, 'Successfully logged in', $user->getId(), $this->session->getId());
     }
 
     public function processLogout(): void
