@@ -5,6 +5,7 @@ namespace Pantono\Authentication\Model;
 use Pantono\Database\Traits\SavableModel;
 use Pantono\Contracts\Attributes\Locator;
 use Pantono\Authentication\TwoFactorAuth;
+use Pantono\Contracts\Attributes\Filter;
 
 #[Locator(methodName: 'getTypeById', className: TwoFactorAuth::class)]
 class TfaType
@@ -18,6 +19,7 @@ class TfaType
     /**
      * @var array<string,mixed>
      */
+    #[Filter('json_decode')]
     private ?array $config = null;
 
     public function getId(): ?int
