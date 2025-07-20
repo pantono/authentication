@@ -31,6 +31,5 @@ MaybeLoggedIn:
     - "@UserAuthentication"
 NotLoggedIn:
   class: Pantono\Authentication\Gates\NotLoggedIn
-  global: true
   parameters:
     - "@Session"
