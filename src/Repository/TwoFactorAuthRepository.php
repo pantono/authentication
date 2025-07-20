@@ -58,4 +58,9 @@ class TwoFactorAuthRepository extends MysqlRepository
     {
         return $this->selectSingleRow('user_tfa_method', 'id', $id);
     }
+
+    public function getAttemptBySecret(int $id): ?array
+    {
+        return $this->selectSingleRow('user_tfa_attempt', 'secret', $id);
+    }
 }

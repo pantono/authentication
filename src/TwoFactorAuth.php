@@ -68,6 +68,11 @@ class TwoFactorAuth
         return $this->hydrator->hydrate(UserTfaAttempt::class, $this->repository->getAttemptById($id));
     }
 
+    public function getAttemptBySecret(int $id): ?UserTfaAttempt
+    {
+        return $this->hydrator->hydrate(UserTfaAttempt::class, $this->repository->getAttemptBySecret($id));
+    }
+
     public function saveAttempt(UserTfaAttempt $attempt): void
     {
         $this->repository->saveAttempt($attempt);
