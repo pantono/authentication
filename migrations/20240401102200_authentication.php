@@ -175,9 +175,9 @@ final class Authentication extends AbstractMigration
         if ($this->isMigratingUp()) {
             $this->table('tfa_type')
                 ->insert([
-                    ['id' => 1, 'name' => 'Email', 'description' => 'An e-mail sent to your inbox', 'enabled' => 1, 'controller' => 'Pantono\Authentication\Provider\Tfa\EmailTfaController', 'config' => json_encode(['email_copy' => '<p>Your code is {code}</p>', 'verification_required' => false, 'custom_email' => false, 'email_verification_copy' => '<p>Click this link {link} to verify your e-mail</p>'])],
-                    ['id' => 2, 'name' => 'SMS', 'description' => 'An SMS sent to your mobile phone', 'enabled' => 0, 'controller' => 'Pantono\Authentication\Provider\Tfa\SmsTfaController', 'config' => json_encode(['verification_required' => true, 'sid' => '', 'token' => '', 'from_number' => ''])],
-                    ['id' => 3, 'name' => 'TOTP', 'description' => 'A time-based one-time password', 'enabled' => 0, 'controller' => 'Pantono\Authentication\Provider\Tfa\TotpTfaController', 'config' => json_encode(['qr_label' => 'Pantono'])],
+                    ['id' => 1, 'name' => 'Email', 'description' => 'An e-mail sent to your inbox', 'enabled' => 1, 'controller' => 'Pantono\Authentication\Provider\Tfa\EmailTfaProvider', 'config' => json_encode(['email_copy' => '<p>Your code is {code}</p>', 'verification_required' => false, 'custom_email' => false, 'email_verification_copy' => '<p>Click this link {link} to verify your e-mail</p>'])],
+                    ['id' => 2, 'name' => 'SMS', 'description' => 'An SMS sent to your mobile phone', 'enabled' => 0, 'controller' => 'Pantono\Authentication\Provider\Tfa\SmsTfaProvider', 'config' => json_encode(['verification_required' => true, 'sid' => '', 'token' => '', 'from_number' => ''])],
+                    ['id' => 3, 'name' => 'TOTP', 'description' => 'A time-based one-time password', 'enabled' => 0, 'controller' => 'Pantono\Authentication\Provider\Tfa\TotpTfaProvider', 'config' => json_encode(['qr_label' => 'Pantono'])],
                 ])->save();
         }
 
