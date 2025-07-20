@@ -18,7 +18,7 @@ class UserTfaAttempt
     private \DateTimeInterface $dateCreated;
     private \DateTimeInterface $dateExpires;
     private string $attemptCode;
-    private string $attemptSecret;
+    private string $attemptSlug;
     private bool $verified = false;
 
     public function getId(): ?int
@@ -71,14 +71,14 @@ class UserTfaAttempt
         $this->attemptCode = $attemptCode;
     }
 
-    public function getAttemptSecret(): string
+    public function getAttemptSlug(): string
     {
-        return $this->attemptSecret;
+        return $this->attemptSlug;
     }
 
-    public function setAttemptSecret(string $attemptSecret): void
+    public function setAttemptSlug(string $attemptSlug): void
     {
-        $this->attemptSecret = $attemptSecret;
+        $this->attemptSlug = $attemptSlug;
     }
 
     public function isVerified(): bool

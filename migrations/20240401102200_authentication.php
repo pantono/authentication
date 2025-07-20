@@ -199,7 +199,7 @@ final class Authentication extends AbstractMigration
             ->addColumn('date_created', 'datetime')
             ->addColumn('date_expires', 'datetime')
             ->addColumn('attempt_code', 'string')
-            ->addColumn('attempt_secret', 'string')
+            ->addColumn('attempt_slug', 'string')
             ->addColumn('verified', 'boolean', ['default' => 0])
             ->addForeignKey('method_id', 'user_tfa_method', 'id')
             ->create();

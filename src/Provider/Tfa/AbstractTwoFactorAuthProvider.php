@@ -24,7 +24,7 @@ abstract class AbstractTwoFactorAuthProvider
         $attempt->setMethod($method);
         $attempt->setDateCreated(new \DateTime);
         $attempt->setAttemptCode(StringUtilities::generateRandomString());
-        $attempt->setAttemptSecret(StringUtilities::generateRandomToken());
+        $attempt->setAttemptSlug(StringUtilities::generateRandomString(20));
         $attempt->setDateExpires(new \DateTimeImmutable('+1 hour'));
         $attempt->setVerified(false);
         return $attempt;

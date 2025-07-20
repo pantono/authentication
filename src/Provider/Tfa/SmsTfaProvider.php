@@ -45,7 +45,7 @@ class SmsTfaProvider extends AbstractTwoFactorAuthProvider
     public function verify(UserTfaAttempt $attempt, array $data): bool
     {
         $code = $data['code'] ?? null;
-        if ($attempt->getAttemptSecret() === $code) {
+        if ($attempt->getAttemptSlug() === $code) {
             $this->auth->completeTwoFactorAuth($attempt);
             return true;
         }
