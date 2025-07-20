@@ -67,6 +67,7 @@ class UserAuthentication
     {
         $this->session->remove('user_id');
         $this->session->remove('login_provider');
+        $this->session->remove('tfa_user_id');
     }
 
     public function getAuthenticationProvider(LoginProvider $loginProvider): AbstractAuthenticationProvider
