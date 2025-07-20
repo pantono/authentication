@@ -6,3 +6,5 @@ GoogleAuthProvider:
   class: Pantono\Authentication\Provider\GoogleAuthProvider
 Users:
   class: Pantono\Authentication\Users
+TwoFactorAuth:
+  class: Pantono\Authentication\TwoFactorAuth
