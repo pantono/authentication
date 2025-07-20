@@ -55,7 +55,8 @@ class EmailTfaProvider extends AbstractTwoFactorAuthProvider
             throw new \RuntimeException('Invalid config for email provider, missing copy');
         }
         $message = $this->email->createMessage();
-        $message->to($toAddress, $method->getUser()->getName())->setRenderedHtml($copy);
+        $message->to($toAddress, $method->getUser()->getName())->setRenderedHtml($copy)
+            ->subject('Your verification code is ' . $attempt->getAttemptCode());
         $this->email->sendEmail($message);
 
         $this->auth->addLogToAttempt($attempt, 'Email sent to ' . $toAddress);
