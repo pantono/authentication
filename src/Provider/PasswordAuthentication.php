@@ -8,6 +8,8 @@ use Pantono\Authentication\Model\User;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Exception\EmailAlreadyExists;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Pantono\Hydrator\Locator\StaticLocator;
 
 class PasswordAuthentication extends AbstractAuthenticationProvider
 {
@@ -35,12 +37,15 @@ class PasswordAuthentication extends AbstractAuthenticationProvider
         }
         $user = $this->users->getUserByEmailAddress($username);
         if ($user === null) {
+            $this->authentication->addLogForProvider($this->getProviderConfig(), 'User not found', null, $this->getSession()->getId(), ['username' => $username]);
             throw new UserDoesNotExistException('User does not exist');
         }
         if (password_verify($password, $user->getPassword()) === false) {
+            $this->authentication->addLogForProvider($this->getProviderConfig(), 'User not found', $user->getId(), $this->getSession()->getId(), ['username' => $username]);
             throw new InvalidPasswordException('Password is incorrect');
         }
         if (password_needs_rehash($user->getPassword(), PASSWORD_DEFAULT) === true) {
+            $this->authentication->addLogForProvider($this->getProviderConfig(), 'Password re-hashed', $user->getId(), $this->getSession()->getId());
             $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
         }
         $user->setDateLastLogin(new \DateTimeImmutable());
@@ -70,5 +75,14 @@ class PasswordAuthentication extends AbstractAuthenticationProvider
         $user->setDateCreated(new \DateTimeImmutable());
         $this->users->saveUser($user);
         return $user;
+    }
+
+    private function getSession(): Session
+    {
+        $session = StaticLocator::getLocator()->loadDependency('@Session');
+        if (!$session) {
+            throw new \RuntimeException('Session provider not setup');
+        }
+        return $session;
     }
 }
