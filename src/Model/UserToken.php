@@ -8,6 +8,7 @@ use Pantono\Contracts\Attributes\NoSave;
 use Pantono\Database\Traits\SavableModel;
 use Pantono\Contracts\Attributes\Lazy;
 use Pantono\Authentication\UserAuthentication;
+use Pantono\Authentication\Users;
 
 #[Locator(methodName: 'getUserTokenById', className: UserAuthentication::class)]
 class UserToken
@@ -23,7 +24,7 @@ class UserToken
     private \DateTimeInterface $dateCreated;
     private \DateTimeInterface $dateExpires;
     private \DateTimeInterface $dateLastUsed;
-    #[Locator(methodName: 'getUserById', className: UserAuthentication::class), FieldName('user_id'), NoSave, Lazy]
+    #[Locator(methodName: 'getUserById', className: Users::class), FieldName('user_id'), NoSave, Lazy]
     private ?User $user = null;
 
     public function getId(): ?int
