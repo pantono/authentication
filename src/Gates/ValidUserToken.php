@@ -38,9 +38,9 @@ class ValidUserToken implements SecurityGateInterface
             $tokenString = $session->get('api_token');
         }
         $jwtUserId = null;
-        $decoded = new \stdClass();
-        if (!$tokenString && $request->headers->has('Authorization')) {
-            $tokenString = $request->headers->get('Authorization');
+        $requestHeaders = new ParameterBag(getallheaders());
+        if (!$tokenString && $requestHeaders->has('Authorization')) {
+            $tokenString = $requestHeaders->get('Authorization');
             [, $tokenString] = explode(' ', $tokenString, 2);
             try {
                 $decoded = JWT::decode($tokenString, new Key($this->getJwtSecret(), 'HS256'));
@@ -81,16 +81,6 @@ class ValidUserToken implements SecurityGateInterface
         }
         $event->setSecurityContext($this->securityContext);
         $this->dispatcher->dispatch($event);
-    }
-
-    private function processJwtLogin(Request $request, EndpointDefinitionInterface $endpoint, ParameterBag $options, ?Session $session = null)
-    {
-        $header = $request->headers->get('Authorization');
-        [$type, $token] = explode(' ', $header, 2);
-        if (strtolower($type) === 'bearer') {
-            JWT::$leeway = 60;
-            $decoded = JWT::decode($token, new Key($this->getJwtSecret(), 'HS256'));
-        }
     }
 
     private function getJwtSecret(): ?string
