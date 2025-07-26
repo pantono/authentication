@@ -108,7 +108,7 @@ class UserAuthentication
         $token->setUser($user);
         $token->setUserId($id);
         $token->setDateCreated(new \DateTimeImmutable());
-        $token->setToken($this->getAvailableToken());
+        $token->setToken($this->getAvailableToken($user, $expires));
         $token->setDateExpires($expires);
         $token->setApiTokenId($apiTokenId);
         $token->setDateLastUsed(new \DateTimeImmutable());
@@ -116,13 +116,17 @@ class UserAuthentication
         return $token;
     }
 
-    private function getAvailableToken(): string
+    private function getAvailableToken(User $user, ?\DateTimeInterface $expiry = null): string
     {
+        if ($expiry === null) {
+            $expiry = new \DateTimeImmutable('+1 day');
+        }
         return JWT::encode([
-            'iss' => 'issuer',
-            'aud' => 'aud',
+            'iss' => 'https://pantono.com',
+            'aud' => 'https://pantono.com/aud',
+            'sub' => $user->getId(),
             'iat' => (new \DateTime)->format('U'),
-            'exp' => (new \DateTime('+1 hour'))->format('U'),
+            'exp' => $expiry->format('U'),
         ], $this->getJwtSecret(), 'HS256');
     }
 
