@@ -16,6 +16,9 @@ use Pantono\Authentication\Model\LoginProviderType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Pantono\Authentication\Exception\TwoFactorAuthRequired;
 use Pantono\Authentication\Model\UserTfaAttempt;
+use Firebase\JWT\JWT;
+use Pantono\Utilities\ApplicationHelper;
+use Pantono\Config\Config;
 
 class UserAuthentication
 {
@@ -23,13 +26,15 @@ class UserAuthentication
     private Hydrator $hydrator;
     private Users $users;
     private Session $session;
+    private Config $config;
 
-    public function __construct(UserAuthenticationRepository $repository, Hydrator $hydrator, Users $users, Session $session)
+    public function __construct(UserAuthenticationRepository $repository, Hydrator $hydrator, Users $users, Session $session, Config $config)
     {
         $this->repository = $repository;
         $this->hydrator = $hydrator;
         $this->users = $users;
         $this->session = $session;
+        $this->config = $config;
     }
 
     public function getUserTokenById(int $id): ?UserToken
@@ -113,11 +118,12 @@ class UserAuthentication
 
     private function getAvailableToken(): string
     {
-        $token = StringUtilities::generateRandomString(200);
-        while (!empty($this->repository->getUserByToken($token))) {
-            $token = StringUtilities::generateRandomString(200);
-        }
-        return $token;
+        return JWT::encode([
+            'iss' => 'issuer',
+            'aud' => 'aud',
+            'iat' => (new \DateTime)->format('U'),
+            'exp' => (new \DateTime('+1 hour'))->format('U'),
+        ], $this->getJwtSecret(), 'HS256');
     }
 
     public function getLoginProviderById(int $id): ?LoginProvider
@@ -165,5 +171,14 @@ class UserAuthentication
     public function getLoginProviderUserById(int $id): ?LoginProviderUser
     {
         return $this->hydrator->hydrate(LoginProviderUser::class, $this->repository->getLoginProviderUserById($id));
+    }
+
+    private function getJwtSecret(): string
+    {
+        $secret = $this->config->getApplicationConfig()->getValue('jwt.secret');
+        if (!$secret) {
+            throw new \RuntimeException('JWT secret not set');
+        }
+        return $secret;
     }
 }
