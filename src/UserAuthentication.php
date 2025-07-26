@@ -19,6 +19,7 @@ use Pantono\Authentication\Model\UserTfaAttempt;
 use Firebase\JWT\JWT;
 use Pantono\Utilities\ApplicationHelper;
 use Pantono\Config\Config;
+use Pantono\Contracts\Security\SecurityContextInterface;
 
 class UserAuthentication
 {
@@ -27,14 +28,16 @@ class UserAuthentication
     private Users $users;
     private Session $session;
     private Config $config;
+    private SecurityContextInterface $securityContext;
 
-    public function __construct(UserAuthenticationRepository $repository, Hydrator $hydrator, Users $users, Session $session, Config $config)
+    public function __construct(UserAuthenticationRepository $repository, Hydrator $hydrator, Users $users, Session $session, Config $config, SecurityContextInterface $securityContext)
     {
         $this->repository = $repository;
         $this->hydrator = $hydrator;
         $this->users = $users;
         $this->session = $session;
         $this->config = $config;
+        $this->securityContext = $securityContext;
     }
 
     public function getUserTokenById(int $id): ?UserToken
@@ -62,7 +65,8 @@ class UserAuthentication
             throw new TwoFactorAuthRequired('Two factor auth is required to continue');
         }
         $this->session->set('user_id', $user->getId());
-        $this->addTokenForUser($user, new \DateTimeImmutable('+1 day'));
+        $token = $this->addTokenForUser($user, new \DateTimeImmutable('+1 day'));
+        $this->securityContext->set('user_token', $token);
         if ($isTfa) {
             $this->addLogForProvider($provider, 'Successfully logged in with two factor auth', $user->getId(), $this->session->getId());
         }
