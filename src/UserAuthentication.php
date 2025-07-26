@@ -62,6 +62,7 @@ class UserAuthentication
             throw new TwoFactorAuthRequired('Two factor auth is required to continue');
         }
         $this->session->set('user_id', $user->getId());
+        $this->addTokenForUser($user, new \DateTimeImmutable('+1 day'));
         if ($isTfa) {
             $this->addLogForProvider($provider, 'Successfully logged in with two factor auth', $user->getId(), $this->session->getId());
         }
