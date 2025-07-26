@@ -23,7 +23,7 @@ class UserToken
     private \DateTimeInterface $dateCreated;
     private \DateTimeInterface $dateExpires;
     private \DateTimeInterface $dateLastUsed;
-    #[Locator(serviceName: 'UserAuthentication', methodName: 'getUserById'), FieldName('user_id'), NoSave, Lazy]
+    #[Locator(methodName: 'getUserById', className: UserAuthentication::class), FieldName('user_id'), NoSave, Lazy]
     private ?User $user = null;
 
     public function getId(): ?int
