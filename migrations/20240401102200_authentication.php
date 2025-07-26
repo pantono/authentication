@@ -72,7 +72,7 @@ final class Authentication extends AbstractMigration
         $this->table('user_token')
             ->addColumn('user_id', 'integer', ['signed' => false])
             ->addColumn('api_token_id', 'integer', ['signed' => false, 'null' => true])
-            ->addColumn('token', 'string', ['length' => \Phinx\Db\Adapter\MysqlAdapter::TEXT_MEDIUM])
+            ->addColumn('token', 'text', ['length' => \Phinx\Db\Adapter\MysqlAdapter::TEXT_MEDIUM])
             ->addColumn('date_created', 'datetime')
             ->addColumn('date_expires', 'datetime')
             ->addColumn('date_last_used', 'datetime')
