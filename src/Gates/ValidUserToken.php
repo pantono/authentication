@@ -32,6 +32,10 @@ class ValidUserToken implements SecurityGateInterface
         if (!$tokenString && $session !== null) {
             $tokenString = $session->get('api_token');
         }
+        if (!$tokenString && $request->headers->has('Authorization')) {
+            $tokenString = $request->headers->get('Authorization');
+            [, $tokenString] = explode(' ', $tokenString, 2);
+        }
 
         if (!$tokenString) {
             throw new AccessDeniedException('User authentication token is required');
