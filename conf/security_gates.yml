@@ -4,6 +4,7 @@ ValidUserToken:
     - "@Authentication"
     - "@SecurityContext"
     - "@EventDispatcher"
+    - "@Config"
 ValidApiToken:
   class: Pantono\Authentication\Gates\ValidApiToken
   parameters:
