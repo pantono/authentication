@@ -27,7 +27,9 @@ class HasPermissionTest extends TestCase
     public function testValidPermission()
     {
         $user = new User();
-        $user->setPermissions(['test' => true]);
+        $permission = new Permission();
+        $permission->setName('test');
+        $user->setPermissions([$permission]);
         $this->securityContext->expects($this->once())
             ->method('get')
             ->with('user')

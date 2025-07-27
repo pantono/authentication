@@ -37,7 +37,6 @@ class ValidApiToken implements SecurityGateInterface
         if ($token === null) {
             throw new AccessDeniedException('ApiKey is invalid');
         }
-
         if ($token->getDateExpires() <= new \DateTime) {
             throw new AccessDeniedException('ApiKey is expired');
         }

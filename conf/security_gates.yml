@@ -34,3 +34,9 @@ NotLoggedIn:
   class: Pantono\Authentication\Gates\NotLoggedIn
   parameters:
     - "@Session"
+IsTwoFactorAuthed:
+  class: Pantono\Authentication\Gates\IsTwoFactorAuthed
+  depends:
+    - ValidUserToken
+  parameters:
+    - "@TwoFactorAuth"

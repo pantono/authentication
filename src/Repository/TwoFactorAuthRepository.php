@@ -63,4 +63,15 @@ class TwoFactorAuthRepository extends MysqlRepository
     {
         return $this->selectSingleRow('user_tfa_attempt', 'secret', $id);
     }
+
+    public function getLastSuccessfulAttemptForUser(User $user): ?array
+    {
+        $select = $this->getDb()->select()->from('user_tfa_attempt', [])
+            ->where('user_tfa_attempt.user_id=?', $user->getId())
+            ->where('verified=1')
+            ->order('user_tfa_attempt.id DESC')
+            ->limit(1);
+
+        return $this->selectSingleRowFromQuery($select);
+    }
 }

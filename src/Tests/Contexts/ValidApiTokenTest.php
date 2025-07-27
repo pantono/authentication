@@ -55,7 +55,7 @@ class ValidApiTokenTest extends TestCase
             ->method('getApiTokenByToken')
             ->with('test')
             ->willReturn($expected);
-        $this->apiAuthentication->expects($this->once())
+        $this->apiAuthentication->expects($this->never())
             ->method('updateApiTokenLastSeen');
         $this->expectExceptionCode(401);
         $this->expectExceptionMessage('ApiKey is expired');

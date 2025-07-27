@@ -6,7 +6,6 @@ use Pantono\Authentication\Repository\UserAuthenticationRepository;
 use Pantono\Hydrator\Hydrator;
 use Pantono\Authentication\Model\User;
 use Pantono\Authentication\Model\UserToken;
-use Pantono\Utilities\StringUtilities;
 use Pantono\Authentication\Provider\AbstractAuthenticationProvider;
 use Pantono\Authentication\Model\LoginProvider;
 use Pantono\Authentication\Model\LoginProviderUser;
@@ -17,7 +16,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Pantono\Authentication\Exception\TwoFactorAuthRequired;
 use Pantono\Authentication\Model\UserTfaAttempt;
 use Firebase\JWT\JWT;
-use Pantono\Utilities\ApplicationHelper;
 use Pantono\Config\Config;
 use Pantono\Contracts\Security\SecurityContextInterface;
 
@@ -62,12 +60,13 @@ class UserAuthentication
         if ($user->isTfaEnabled() && !$isTfa) {
             $this->session->set('tfa_user_id', $user->getId());
             $this->addLogForProvider($provider, 'First stage login completed, Two factor auth required', $user->getId(), $this->session->getId());
-            throw new TwoFactorAuthRequired('Two factor auth is required to continue');
+            throw new TwoFactorAuthRequired();
         }
         $this->session->set('user_id', $user->getId());
         $token = $this->addTokenForUser($user, new \DateTimeImmutable('+1 day'));
         $this->securityContext->set('user_token', $token);
         if ($isTfa) {
+            $this->session->set('tfa_attempt_id', $twoFactorAuthAttempt->getId());
             $this->addLogForProvider($provider, 'Successfully logged in with two factor auth', $user->getId(), $this->session->getId());
         }
         $this->addLogForProvider($provider, 'Successfully logged in', $user->getId(), $this->session->getId());

@@ -97,4 +97,9 @@ class TwoFactorAuth
     {
         $this->repository->addLogToAttempt($attempt, $string);
     }
+
+    public function getLastSuccessfulAttemptForUser(User $user): ?UserTfaAttempt
+    {
+        return $this->hydrator->hydrate(UserTfaAttempt::class, $this->repository->getLastSuccessfulAttemptForUser($user));
+    }
 }
