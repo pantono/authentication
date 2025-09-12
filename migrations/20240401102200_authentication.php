@@ -35,6 +35,7 @@ final class Authentication extends AbstractMigration
 
         $this->table('user_field_type')
             ->addColumn('name', 'string')
+            ->addColumn('label', 'string')
             ->addColumn('type', 'string')
             ->addColumn('required', 'boolean')
             ->create();
