@@ -146,4 +146,15 @@ class UsersRepository extends MysqlRepository
         return $this->selectSingleRow('permission', 'id', $id);
     }
 
+    public function getUserByField(string $field, mixed $value): ?array
+    {
+        $select = $this->getDb()->select()->from('user')
+            ->joinInner('user_field', 'user.id=user_field.user_id', [])
+            ->joinInner('user_field_type', 'user_field_type.id=user_field.field_type_id', [])
+            ->where('user_field_type.name=?', $field)
+            ->where('user_field.value=?', $value);
+
+        return $this->selectSingleRowFromQuery($select);
+    }
+
 }

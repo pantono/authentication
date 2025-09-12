@@ -48,6 +48,11 @@ class Users
         return $this->hydrator->hydrate(Group::class, $this->repository->getGroupById($id));
     }
 
+    public function getUserByField(string $field, mixed $value): ?User
+    {
+        return $this->hydrator->hydrate(User::class, $this->repository->getUserByField($field, $value));
+    }
+
     public function createUser(array $data): User
     {
         $parameters = new ParameterBag($data);

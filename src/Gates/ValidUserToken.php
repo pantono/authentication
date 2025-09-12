@@ -38,13 +38,19 @@ class ValidUserToken implements SecurityGateInterface
             $tokenString = $session->get('api_token');
         }
         $jwtUserId = null;
+        $decoded = new \stdClass();
         $requestHeaders = new ParameterBag(getallheaders());
         if (!$tokenString && $requestHeaders->has('Authorization')) {
             $tokenString = $requestHeaders->get('Authorization');
             [, $tokenString] = explode(' ', $tokenString, 2);
             try {
-                $decoded = JWT::decode($tokenString, new Key($this->getJwtSecret(), 'HS256'));
-                $jwtUserId = $decoded->data->user_id;
+                $secret = $this->getJwtSecret();
+                if ($secret) {
+                    $decoded = JWT::decode($tokenString, new Key($secret, 'HS256'));
+                    $jwtUserId = $decoded->data->user_id;
+                } else {
+                    $tokenString = null;
+                }
             } catch (\Exception $e) {
                 $tokenString = null;
             }
@@ -83,7 +89,7 @@ class ValidUserToken implements SecurityGateInterface
         $this->dispatcher->dispatch($event);
     }
 
-    private function getJwtSecret(): ?string
+    private function getJwtSecret(): string
     {
         $secret = $this->config->getApplicationConfig()->getValue('jwt.secret');
         if (!$secret) {
