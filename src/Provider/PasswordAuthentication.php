@@ -45,7 +45,7 @@ class PasswordAuthentication extends AbstractAuthenticationProvider
             throw new PasswordAuthNotAvailableException('Password authentication not available for this user');
         }
         if (password_verify($password, $user->getPassword()) === false) {
-            $this->authentication->addLogForProvider($this->getProviderConfig(), 'User not found', $user->getId(), $this->getSession()->getId(), ['username' => $username]);
+            $this->authentication->addLogForProvider($this->getProviderConfig(), 'Incorrect password', $user->getId(), $this->getSession()->getId(), ['username' => $username]);
             throw new InvalidPasswordException('Password is incorrect');
         }
         if (password_needs_rehash($user->getPassword(), PASSWORD_DEFAULT) === true) {
