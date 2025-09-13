@@ -162,7 +162,7 @@ class UserAuthentication
         $this->repository->updateTokenLastSeen($token);
     }
 
-    public function addLogForProvider(LoginProvider $provider, string $entry, ?int $userId = null, ?string $sessionId = null, ?array $data = null): void
+    public function addLogForProvider(LoginProvider $provider, string $entry, ?int $userId = null, ?string $sessionId = null, array $data = []): void
     {
         $ipAddress = RequestHelper::getIp();
         $this->repository->addLogForProvider($provider, $entry, $ipAddress, $userId, $sessionId, $data);
