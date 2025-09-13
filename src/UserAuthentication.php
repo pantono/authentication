@@ -74,6 +74,15 @@ class UserAuthentication
 
     public function processLogout(): void
     {
+        $userId = $this->session->get('user_id');
+        $loginProvider = $this->session->get('login_provider');
+        $provider = null;
+        if ($loginProvider) {
+            $provider = $this->getLoginProviderById($loginProvider);
+        }
+        if ($userId) {
+            $this->addLogForProvider($provider, 'Logged out', $userId, $this->session->getId());;
+        }
         $this->session->remove('user_id');
         $this->session->remove('login_provider');
         $this->session->remove('tfa_user_id');
@@ -162,7 +171,7 @@ class UserAuthentication
         $this->repository->updateTokenLastSeen($token);
     }
 
-    public function addLogForProvider(LoginProvider $provider, string $entry, ?int $userId = null, ?string $sessionId = null, array $data = []): void
+    public function addLogForProvider(?LoginProvider $provider, string $entry, ?int $userId = null, ?string $sessionId = null, array $data = []): void
     {
         $ipAddress = RequestHelper::getIp();
         $this->repository->addLogForProvider($provider, $entry, $ipAddress, $userId, $sessionId, $data);

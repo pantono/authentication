@@ -71,10 +71,10 @@ class UserAuthenticationRepository extends MysqlRepository
         ], ['id=?' => $token->getId()]);
     }
 
-    public function addLogForProvider(LoginProvider $provider, string $entry, ?string $ipAddress, ?int $userId, ?string $sessionId = null, ?array $data = null): void
+    public function addLogForProvider(?LoginProvider $provider, string $entry, ?string $ipAddress, ?int $userId, ?string $sessionId = null, ?array $data = null): void
     {
         $this->getDb()->insert('authentication_log', [
-            'provider_id' => $provider->getId(),
+            'provider_id' => $provider?->getId(),
             'date' => (new \DateTime())->format('Y-m-d H:i:s'),
             'entry' => $entry,
             'ip_address' => $ipAddress,
