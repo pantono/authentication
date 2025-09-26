@@ -195,6 +195,18 @@ class User implements UserInterface
         return false;
     }
 
+    /**
+     * @return array<string>
+     */
+    public function getPermissionList(): array
+    {
+        $permissions = [];
+        foreach ($this->getPermissions() as $permission) {
+            $permissions[] = $permission->getName();
+        }
+        return $permissions;
+    }
+
     public function getFields(): array
     {
         return $this->fields;

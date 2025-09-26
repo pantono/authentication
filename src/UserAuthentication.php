@@ -28,6 +28,8 @@ class UserAuthentication
     private Config $config;
     private SecurityContextInterface $securityContext;
 
+    public const COOKIE_NAME = 'pnto-token';
+
     public function __construct(UserAuthenticationRepository $repository, Hydrator $hydrator, Users $users, Session $session, Config $config, SecurityContextInterface $securityContext)
     {
         $this->repository = $repository;
@@ -65,6 +67,7 @@ class UserAuthentication
         $this->session->set('user_id', $user->getId());
         $token = $this->addTokenForUser($user, new \DateTimeImmutable('+1 day'));
         $this->securityContext->set('user_token', $token);
+        setcookie(self::COOKIE_NAME, $token->getToken(), time() + 3600, '/', '', true, true);
         if ($isTfa) {
             $this->session->set('tfa_attempt_id', $twoFactorAuthAttempt->getId());
             $this->addLogForProvider($provider, 'Successfully logged in with two factor auth', $user->getId(), $this->session->getId());
@@ -140,6 +143,9 @@ class UserAuthentication
             'sub' => $user->getId(),
             'iat' => (new \DateTime)->format('U'),
             'exp' => $expiry->format('U'),
+            'roles' => $user->getPermissions(),
+            'name' => $user->getName(),
+            'groups' => $user->getGroups()
         ], $this->getJwtSecret(), 'HS256');
     }
 
