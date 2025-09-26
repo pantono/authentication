@@ -56,6 +56,10 @@ class ValidUserToken implements SecurityGateInterface
             }
         }
 
+        if (!$tokenString && $request->cookies->get(UserAuthentication::COOKIE_NAME)) {
+            $tokenString = $request->cookies->get(UserAuthentication::COOKIE_NAME);
+        }
+
         if (!$tokenString) {
             throw new AccessDeniedException('User authentication token is required');
         }
