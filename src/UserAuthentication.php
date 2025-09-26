@@ -65,9 +65,9 @@ class UserAuthentication
             throw new TwoFactorAuthRequired();
         }
         $this->session->set('user_id', $user->getId());
-        $token = $this->addTokenForUser($user, new \DateTimeImmutable('+1 day'));
+        $token = $this->addTokenForUser($user, new \DateTimeImmutable('+1 year'));
         $this->securityContext->set('user_token', $token);
-        setcookie(self::COOKIE_NAME, $token->getToken(), time() + 3600, '/', '', true, true);
+        setcookie(self::COOKIE_NAME, $token->getToken(), time() + (3600 * 24 * 365), '/', '', true, true);
         if ($isTfa) {
             $this->session->set('tfa_attempt_id', $twoFactorAuthAttempt->getId());
             $this->addLogForProvider($provider, 'Successfully logged in with two factor auth', $user->getId(), $this->session->getId());
@@ -86,6 +86,7 @@ class UserAuthentication
         if ($userId) {
             $this->addLogForProvider($provider, 'Logged out', $userId, $this->session->getId());;
         }
+        setcookie(self::COOKIE_NAME, null, time() - 3600, '/', '', true, true);
         $this->session->remove('user_id');
         $this->session->remove('login_provider');
         $this->session->remove('tfa_user_id');
