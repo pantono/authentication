@@ -240,6 +240,7 @@ class UserAuthentication
         $reset->setDateCreated(new \DateTimeImmutable('now'));
         $reset->setToken($this->getAvailablePasswordResetTaken());
         $reset->setDateExpires(new \DateTime('+1 hour'));
+        $reset->setCompleted(false);
         $this->savePasswordReset($reset);
         return $reset;
     }
