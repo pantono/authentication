@@ -34,6 +34,7 @@ class PasswordResetEvents implements EventSubscriberInterface
             if ($template && $event->getCurrent()->getUser()) {
                 $this->email->createMessage()
                     ->setTemplate($template)
+                    ->subject('Your password reset')
                     ->to($event->getCurrent()->getUser()->getEmailAddress(), $event->getCurrent()->getUser()->getFullName())
                     ->send();
             }
