@@ -24,6 +24,7 @@ use Pantono\Authentication\Event\PostUserPasswordResetSaveSaveEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Pantono\Authentication\Exception\PasswordReset\PasswordResetAlreadyCompleted;
 use Pantono\Authentication\Exception\PasswordReset\PasswordResetExpired;
+use Pantono\Utilities\StringUtilities;
 
 class UserAuthentication
 {
@@ -166,6 +167,15 @@ class UserAuthentication
         ], $this->getJwtSecret(), 'HS256');
     }
 
+    private function getAvailablePasswordResetTaken(): string
+    {
+        $token = StringUtilities::generateRandomToken();
+        while ($this->repository->getPasswordResetByToken($token)) {
+            $token = StringUtilities::generateRandomToken();
+        }
+        return $token;
+    }
+
     public function getLoginProviderById(int $id): ?LoginProvider
     {
         return $this->hydrator->hydrate(LoginProvider::class, $this->repository->getSocialProviderById($id));
@@ -221,6 +231,17 @@ class UserAuthentication
     public function getPasswordResetById(int $id): ?UserPasswordReset
     {
         return $this->hydrator->hydrate(UserpasswordReset::class, $this->repository->getPasswordResetById($id));
+    }
+
+    public function createPasswordResetForUser(User $user): UserPasswordReset
+    {
+        $reset = new UserPasswordReset();
+        $reset->setUser($user);
+        $reset->setDateCreated(new \DateTimeImmutable('now'));
+        $reset->setToken($this->getAvailablePasswordResetTaken());
+        $reset->setDateExpires(new \DateTime('+1 hour'));
+        $this->savePasswordReset($reset);
+        return $reset;
     }
 
     public function processPasswordReset(UserPasswordReset $passwordReset, string $newPassword): void
