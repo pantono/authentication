@@ -20,7 +20,7 @@ class UserToken
     private ?int $apiTokenId = null;
     #[NoSave]
     private ?string $userName = null;
-    private ?string $token;
+    private string $token;
     private \DateTimeInterface $dateCreated;
     private \DateTimeInterface $dateExpires;
     private \DateTimeInterface $dateLastUsed;
@@ -57,12 +57,12 @@ class UserToken
         $this->userName = $userName;
     }
 
-    public function getToken(): ?string
+    public function getToken(): string
     {
         return $this->token;
     }
 
-    public function setToken(?string $token): void
+    public function setToken(string $token): void
     {
         $this->token = $token;
     }

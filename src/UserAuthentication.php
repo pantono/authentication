@@ -18,6 +18,12 @@ use Pantono\Authentication\Model\UserTfaAttempt;
 use Firebase\JWT\JWT;
 use Pantono\Config\Config;
 use Pantono\Contracts\Security\SecurityContextInterface;
+use Pantono\Authentication\Model\UserPasswordReset;
+use Pantono\Authentication\Event\PreUserPasswordResetSaveSaveEvent;
+use Pantono\Authentication\Event\PostUserPasswordResetSaveSaveEvent;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Pantono\Authentication\Exception\PasswordReset\PasswordResetAlreadyCompleted;
+use Pantono\Authentication\Exception\PasswordReset\PasswordResetExpired;
 
 class UserAuthentication
 {
@@ -29,8 +35,17 @@ class UserAuthentication
     private SecurityContextInterface $securityContext;
 
     public const COOKIE_NAME = 'pnto-token';
+    private EventDispatcher $dispatcher;
 
-    public function __construct(UserAuthenticationRepository $repository, Hydrator $hydrator, Users $users, Session $session, Config $config, SecurityContextInterface $securityContext)
+    public function __construct(
+        UserAuthenticationRepository $repository,
+        Hydrator                     $hydrator,
+        Users                        $users,
+        Session                      $session,
+        Config                       $config,
+        SecurityContextInterface     $securityContext,
+        EventDispatcher              $dispatcher
+    )
     {
         $this->repository = $repository;
         $this->hydrator = $hydrator;
@@ -38,6 +53,7 @@ class UserAuthentication
         $this->session = $session;
         $this->config = $config;
         $this->securityContext = $securityContext;
+        $this->dispatcher = $dispatcher;
     }
 
     public function getUserTokenById(int $id): ?UserToken
@@ -86,7 +102,7 @@ class UserAuthentication
         if ($userId) {
             $this->addLogForProvider($provider, 'Logged out', $userId, $this->session->getId());;
         }
-        setcookie(self::COOKIE_NAME, null, time() - 3600, '/', '', true, true);
+        setcookie(self::COOKIE_NAME, '', time() - 3600, '/', '', true, true);
         $this->session->remove('user_id');
         $this->session->remove('login_provider');
         $this->session->remove('tfa_user_id');
@@ -195,6 +211,49 @@ class UserAuthentication
     public function getLoginProviderUserById(int $id): ?LoginProviderUser
     {
         return $this->hydrator->hydrate(LoginProviderUser::class, $this->repository->getLoginProviderUserById($id));
+    }
+
+    public function getPasswordResetByToken(string $token): ?UserPasswordReset
+    {
+        return $this->hydrator->hydrate(UserpasswordReset::class, $this->repository->getPasswordResetByToken($token));
+    }
+
+    public function getPasswordResetById(int $id): ?UserPasswordReset
+    {
+        return $this->hydrator->hydrate(UserpasswordReset::class, $this->repository->getPasswordResetById($id));
+    }
+
+    public function processPasswordReset(UserPasswordReset $passwordReset, string $newPassword): void
+    {
+        if ($passwordReset->isCompleted() === true) {
+            throw new PasswordResetAlreadyCompleted('Password reset has already been completed');
+        }
+
+        if ($passwordReset->isExpired()) {
+            throw new PasswordResetExpired('Password reset has expired');
+        }
+        if (!$passwordReset->getUser()) {
+            throw new \RuntimeException('User does not exist on password reset');
+        }
+        $this->users->updateUserPassword($passwordReset->getUser(), $newPassword);
+        $passwordReset->setCompleted(true);
+        $this->savePasswordReset($passwordReset);
+    }
+
+    public function savePasswordReset(UserPasswordReset $passwordReset): void
+    {
+        $event = new PreUserPasswordResetSaveSaveEvent();
+        $previous = $passwordReset->getId() ? $this->getPasswordResetById($passwordReset->getId()) : null;
+        $event->setCurrent($passwordReset);
+        $event->setPrevious($previous);
+        $this->dispatcher->dispatch($event);
+
+        $this->repository->savePasswordReset($passwordReset);
+
+        $event = new PostUserPasswordResetSaveSaveEvent();
+        $event->setCurrent($passwordReset);
+        $event->setPrevious($previous);
+        $this->dispatcher->dispatch($event);
     }
 
     private function getJwtSecret(): string

@@ -1,2 +1,4 @@
 UserEvents:
   class: Pantono\Authentication\Events\UserEvents
+PasswordResetEvents:
+  class: Pantono\Authentication\Events\PasswordResetEvents

@@ -7,6 +7,7 @@ use Pantono\Authentication\Model\UserToken;
 use Pantono\Authentication\Model\LoginProviderUser;
 use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Model\LoginProvider;
+use Pantono\Authentication\Model\UserPasswordReset;
 
 class UserAuthenticationRepository extends MysqlRepository
 {
@@ -97,5 +98,23 @@ class UserAuthenticationRepository extends MysqlRepository
     public function getLoginProviderUserById(int $id): ?array
     {
         return $this->selectSingleRow('login_provider_user', 'id', $id);
+    }
+
+    public function getPasswordResetByToken(string $token): ?array
+    {
+        return $this->selectSingleRow('user_password_reset', 'token', $token);
+    }
+
+    public function getPasswordResetById(int $id): ?array
+    {
+        return $this->selectSingleRow('user_password_reset', 'id', $id);
+    }
+
+    public function savePasswordReset(UserPasswordReset $passwordReset): void
+    {
+        $id = $this->insertOrUpdate('user_password_reset', 'id', $passwordReset->getId(), $passwordReset->getAllData());
+        if ($id) {
+            $passwordReset->setId($id);
+        }
     }
 }

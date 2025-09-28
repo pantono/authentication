@@ -73,10 +73,15 @@ class Users
         $user->setPermissions([]);
         $user->setGroups([]);
         if ($parameters->has('password')) {
-            $user->setPassword(password_hash($parameters->get('password'), PASSWORD_DEFAULT));
+            $this->updateUserPassword($user, $parameters->get('password'));
         }
         $this->saveUser($user);
         return $user;
+    }
+
+    public function updateUserPassword(User $user, string $password): void
+    {
+        $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
     }
 
     public function saveUser(User $user): void

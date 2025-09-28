@@ -105,6 +105,11 @@ class User implements UserInterface
         $this->surname = $surname;
     }
 
+    public function getFullName(): string
+    {
+        return sprintf('%s %s', $this->getForename(), $this->getSurname());
+    }
+
     public function getPassword(): ?string
     {
         return $this->password;
