@@ -169,9 +169,9 @@ class UserAuthentication
 
     private function getAvailablePasswordResetTaken(): string
     {
-        $token = StringUtilities::generateRandomToken();
+        $token = urlencode(StringUtilities::generateRandomToken(50));
         while ($this->repository->getPasswordResetByToken($token)) {
-            $token = StringUtilities::generateRandomToken();
+            $token = urlencode(StringUtilities::generateRandomToken(50));
         }
         return $token;
     }
