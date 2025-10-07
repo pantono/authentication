@@ -178,7 +178,7 @@ class UserAuthentication
 
     private function generateToken(int $bytes = 50): string
     {
-        return str_replace('/', '', urlencode(StringUtilities::generateRandomToken($bytes)));
+        return urlencode(str_replace('/', '', StringUtilities::generateRandomToken($bytes)));
     }
 
     public function getLoginProviderById(int $id): ?LoginProvider
