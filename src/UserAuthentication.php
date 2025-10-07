@@ -169,11 +169,16 @@ class UserAuthentication
 
     private function getAvailablePasswordResetTaken(): string
     {
-        $token = urlencode(StringUtilities::generateRandomToken(50));
+        $token = $this->generateToken();
         while ($this->repository->getPasswordResetByToken($token)) {
-            $token = urlencode(StringUtilities::generateRandomToken(50));
+            $token = $this->generateToken();
         }
         return $token;
+    }
+
+    private function generateToken(int $bytes = 50): string
+    {
+        return str_replace('/', '', urlencode(StringUtilities::generateRandomToken($bytes)));
     }
 
     public function getLoginProviderById(int $id): ?LoginProvider
