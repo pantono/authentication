@@ -141,6 +141,7 @@ final class Authentication extends AbstractMigration
             ->addColumn('by_user_id', 'integer', ['signed' => false, 'null' => true])
             ->addColumn('date', 'datetime')
             ->addColumn('entry', 'string')
+            ->addColumn('context', 'json', ['null' => true])
             ->addForeignKey('target_user_id', 'user', 'id', ['delete' => 'CASCADE'])
             ->addForeignKey('by_user_id', 'user', 'id', ['delete' => 'CASCADE'])
             ->create();
