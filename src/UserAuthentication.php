@@ -162,7 +162,7 @@ class UserAuthentication
             'sub' => $user->getId(),
             'iat' => (new \DateTime)->format('U'),
             'exp' => $expiry->format('U'),
-            'roles' => $user->getPermissions(),
+            'roles' => $user->getPermissionList(),
             'name' => $user->getName(),
             'groups' => $user->getGroups()
         ], $this->getJwtSecret(), 'HS256');
