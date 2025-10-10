@@ -25,6 +25,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Pantono\Authentication\Exception\PasswordReset\PasswordResetAlreadyCompleted;
 use Pantono\Authentication\Exception\PasswordReset\PasswordResetExpired;
 use Pantono\Utilities\StringUtilities;
+use Pantono\Authentication\Filter\PasswordResetFilter;
 
 class UserAuthentication
 {
@@ -290,5 +291,24 @@ class UserAuthentication
             throw new \RuntimeException('JWT secret not set');
         }
         return $secret;
+    }
+
+    public function getPasswordResetsByFilter(PasswordResetFilter $filter): array
+    {
+        return $this->hydrator->hydrateSet(UserPasswordReset::class, $this->repository->getPasswordResetsByFilter($filter));
+    }
+
+    public function expirePreviousPasswordResets(UserPasswordReset $reset): void
+    {
+        $filter = new PasswordResetFilter();
+        $filter->setUser($reset->getUser());
+        $filter->setCompleted(false);
+        $filter->setDateExpiresStart(new \DateTimeImmutable('now'));
+        $filter->setPerPage(999999);
+        foreach ($this->getPasswordResetsByFilter($filter) as $previousReset) {
+            $previousReset->setCompleted(true);
+            $previousReset->setDateExpires(new \DateTimeImmutable('now'));
+            $this->savePasswordReset($previousReset);
+        }
     }
 }

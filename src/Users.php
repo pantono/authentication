@@ -7,7 +7,6 @@ use Pantono\Hydrator\Hydrator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Pantono\Authentication\Model\Group;
 use Pantono\Contracts\Locator\UserInterface;
-use Pantono\Authentication\Model\UserToken;
 use Pantono\Authentication\Model\Permission;
 use Pantono\Authentication\Model\User;
 use Pantono\Authentication\Model\UserField;
@@ -16,8 +15,9 @@ use Pantono\Authentication\Event\PreUserSaveEvent;
 use Pantono\Authentication\Event\PostUserSaveEvent;
 use Pantono\Authentication\Filter\UserFilter;
 use Symfony\Component\HttpFoundation\ParameterBag;
-use Pantono\Authentication\Exception\UserCreateException;
 use Pantono\Authentication\Exception\RequiredFieldAlreadyExists;
+use Pantono\Authentication\Filter\UserHistoryFilter;
+use Pantono\Authentication\Model\UserHistory;
 
 class Users
 {
@@ -105,7 +105,7 @@ class Users
      */
     public function getPermissionsForUser(User $user): array
     {
-        return $this->repository->getPermissionsForUser($user);
+        return $this->hydrator->hydrateSet(Permission::class, $this->repository->getPermissionsForUser($user));
     }
 
     public function getPermissionById(int $id): ?Permission
@@ -144,7 +144,12 @@ class Users
         return $this->hydrator->hydrateSet(User::class, $this->repository->getUsersByFilter($filter));
     }
 
-    public function addHistoryForUser(User $user, string $entry, ?User $byUser = null): void
+    public function getUserHistoryByFilter(UserHistoryFilter $filter): array
+    {
+        return $this->hydrator->hydrateSet(UserHistory::class, $this->repository->getUserHistoryByFilter($filter));
+    }
+
+    public function addHistoryForUser(User $user, string $entry, ?User $byUser = null, array $context = []): void
     {
         if ($byUser === null) {
             if (php_sapi_name() == 'cli') {
@@ -156,7 +161,7 @@ class Users
                 throw new \RuntimeException('Unable to find system user');
             }
         }
-        $this->repository->addHistoryForUser($user, $entry, $byUser);
+        $this->repository->addHistoryForUser($user, $entry, $byUser, $context);
     }
 
     /**

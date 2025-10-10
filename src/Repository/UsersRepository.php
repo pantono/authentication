@@ -7,6 +7,7 @@ use Pantono\Authentication\Model\UserToken;
 use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Model\User;
 use Pantono\Authentication\Filter\UserFilter;
+use Pantono\Authentication\Filter\UserHistoryFilter;
 
 class UsersRepository extends MysqlRepository
 {
@@ -121,13 +122,14 @@ class UsersRepository extends MysqlRepository
         return $this->getDb()->fetchAll($select);
     }
 
-    public function addHistoryForUser(User $user, string $entry, User $byUser): void
+    public function addHistoryForUser(User $user, string $entry, User $byUser, array $context = []): void
     {
         $this->getDb()->insert('user_history', [
             'target_user_id' => $user->getId(),
             'date' => (new \DateTime())->format('Y-m-d H:i:s'),
             'entry' => $entry,
-            'by_user_id' => $byUser->getId()
+            'by_user_id' => $byUser->getId(),
+            'context' => json_encode($context)
         ]);
     }
 
@@ -157,4 +159,27 @@ class UsersRepository extends MysqlRepository
         return $this->selectSingleRowFromQuery($select);
     }
 
+
+    public function getUserHistoryByFilter(UserHistoryFilter $filter): array
+    {
+        $select = $this->getDb()->select()->from('user_history');
+
+        if ($filter->getUser() !== null) {
+            $select->where('user_history.target_user_id=?', $filter->getUser()->getId());
+        }
+        if ($filter->getStartDate() !== null) {
+            $select->where('user_history.date >= ?', $filter->getStartDate()->format('Y-m-d H:i:s'));
+        }
+        if ($filter->getEndDate() !== null) {
+            $select->where('user_history.date <= ?', $filter->getEndDate()->format('Y-m-d H:i:s'));
+        }
+        foreach ($filter->getFields() as $field) {
+            $select->where('user_history->>' . $field['name'] . ' = ?', $field['value']);
+        }
+
+        $filter->setTotalResults($this->getCount($select));
+
+        $select->limitPage($filter->getPage(), $filter->getPerPage());
+        return $this->getDb()->fetchAll($select);
+    }
 }

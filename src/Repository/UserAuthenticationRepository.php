@@ -8,6 +8,7 @@ use Pantono\Authentication\Model\LoginProviderUser;
 use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Model\LoginProvider;
 use Pantono\Authentication\Model\UserPasswordReset;
+use Pantono\Authentication\Model\User;
 
 class UserAuthenticationRepository extends MysqlRepository
 {
@@ -116,5 +117,33 @@ class UserAuthenticationRepository extends MysqlRepository
         if ($id) {
             $passwordReset->setId($id);
         }
+    }
+
+    public function getPasswordResetsByFilter(\Pantono\Authentication\Filter\PasswordResetFilter $filter): array
+    {
+        $select = $this->getDb()->select()->from('user_password_reset');
+
+        if ($filter->getUser()) {
+            $select->where('user_id=?', $filter->getUser()->getId());
+        }
+        if ($filter->getCompleted() !== null) {
+            $select->where('completed=?', $filter->getCompleted() ? 1 : 0);
+        }
+        if ($filter->getDateCreatedStart() !== null) {
+            $select->where('date_created >= ?', $filter->getDateCreatedStart()->format('Y-m-d H:i:s'));
+        }
+        if ($filter->getDateCreatedEnd() !== null) {
+            $select->where('date_created <= ?', $filter->getDateCreatedEnd()->format('Y-m-d H:i:s'));
+        }
+        if ($filter->getDateExpiresStart() !== null) {
+            $select->where('date_expires >= ?', $filter->getDateExpiresStart()->format('Y-m-d H:i:s'));
+        }
+        if ($filter->getDateExpiresEnd() !== null) {
+            $select->where('date_expires <= ?', $filter->getDateExpiresEnd()->format('Y-m-d H:i:s'));
+        }
+        $filter->setTotalResults($this->getCount($select));
+        $select->limitPage($filter->getPage(), $filter->getPerPage());
+
+        return $this->getDb()->fetchAll($select);
     }
 }
