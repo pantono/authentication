@@ -26,6 +26,7 @@ use Pantono\Authentication\Exception\PasswordReset\PasswordResetAlreadyCompleted
 use Pantono\Authentication\Exception\PasswordReset\PasswordResetExpired;
 use Pantono\Utilities\StringUtilities;
 use Pantono\Authentication\Filter\PasswordResetFilter;
+use Pantono\Authentication\Event\JwtAuthenticationDataEvent;
 
 class UserAuthentication
 {
@@ -156,7 +157,8 @@ class UserAuthentication
         if ($expiry === null) {
             $expiry = new \DateTimeImmutable('+1 day');
         }
-        return JWT::encode([
+        $event = new JwtAuthenticationDataEvent($user);
+        $event->setData([
             'iss' => 'https://pantono.com',
             'aud' => 'https://pantono.com/aud',
             'sub' => $user->getId(),
@@ -165,7 +167,9 @@ class UserAuthentication
             'roles' => $user->getPermissionList(),
             'name' => $user->getName(),
             'groups' => $user->getGroups()
-        ], $this->getJwtSecret(), 'HS256');
+        ]);
+        $this->dispatcher->dispatch($event);
+        return JWT::encode($event->getData(), $this->getJwtSecret(), 'HS256');
     }
 
     private function getAvailablePasswordResetTaken(): string
