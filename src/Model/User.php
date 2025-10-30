@@ -234,8 +234,10 @@ class User implements UserInterface
     public function getFieldByName(string $name): mixed
     {
         foreach ($this->getFields() as $field) {
-            if ($field->getType()->getName() === $name) {
-                return $field->getCastedValue();
+            if ($field->getType()) {
+                if ($field->getType()->getName() === $name) {
+                    return $field->getCastedValue();
+                }
             }
         }
         return null;
