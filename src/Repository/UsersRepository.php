@@ -54,6 +54,25 @@ class UsersRepository extends MysqlRepository
         foreach ($user->getPermissions() as $permission) {
             $this->getDb()->insert('user_permission', ['user_id' => $user->getId(), 'permission_id' => $permission->getId()]);
         }
+
+        $ids = [];
+        foreach ($user->getFields() as $field) {
+            $id = $this->insertOrUpdate('user_field', 'id', $field->getId(), [
+                'user_id' => $user->getId(),
+                'field_type_id' => $field->getType()->getId(),
+                'value' => $field->getValue()
+            ]);
+            if ($id) {
+                $field->setId($id);
+            }
+            $ids[] = $id;
+        }
+
+        $params = ['user_id=?' => $user->getId()];
+        if (!empty($ids)) {
+            $params['id NOT IN (?)'] = $ids;
+        }
+        $this->getDb()->delete('user_field', $params);
     }
 
     public function getFieldsForUser(User $user): array
