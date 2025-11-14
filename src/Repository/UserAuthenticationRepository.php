@@ -9,6 +9,7 @@ use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Model\LoginProvider;
 use Pantono\Authentication\Model\UserPasswordReset;
 use Pantono\Authentication\Model\User;
+use Pantono\Authentication\Model\LoginOneTimeLink;
 
 class UserAuthenticationRepository extends MysqlRepository
 {
@@ -145,5 +146,23 @@ class UserAuthenticationRepository extends MysqlRepository
         $select->limitPage($filter->getPage(), $filter->getPerPage());
 
         return $this->getDb()->fetchAll($select);
+    }
+
+    public function getOneTimeLinkByToken(string $token): ?array
+    {
+        return $this->selectSingleRow('login_one_time_link', 'token', $token);
+    }
+
+    public function getOneTimeLinkById(int $id): ?array
+    {
+        return $this->selectSingleRow('login_one_time_link', 'id', $id);
+    }
+
+    public function saveOneTimeLink(LoginOneTimeLink $link): void
+    {
+        $id = $this->insertOrUpdate('login_one_time_link', 'id', $link->getId(), $link->getAllData());
+        if ($id) {
+            $link->setId($id);
+        }
     }
 }

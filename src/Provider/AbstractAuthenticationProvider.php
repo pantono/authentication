@@ -21,7 +21,7 @@ abstract class AbstractAuthenticationProvider
      *
      * @return string|null
      */
-    abstract public function initiateLogin(): ?string;
+    abstract public function initiateLogin(array $parameters = []): ?string;
 
     /**
      * Initiates registration setup. If a string is returned, it should be a redirect URI to continue

@@ -27,6 +27,10 @@ use Pantono\Authentication\Exception\PasswordReset\PasswordResetExpired;
 use Pantono\Utilities\StringUtilities;
 use Pantono\Authentication\Filter\PasswordResetFilter;
 use Pantono\Authentication\Event\JwtAuthenticationDataEvent;
+use Pantono\Authentication\Model\LoginOneTimeLink;
+use Pantono\Authentication\Event\PreLoginOneTimeLinkEvent;
+use Pantono\Authentication\Event\PostLoginOneTimeLinkEvent;
+use Pantono\Authentication\Exception\AccessDeniedException;
 
 class UserAuthentication
 {
@@ -87,7 +91,7 @@ class UserAuthentication
         $token = $this->addTokenForUser($user, new \DateTimeImmutable('+1 year'));
         $this->securityContext->set('user_token', $token);
         setcookie(self::COOKIE_NAME, $token->getToken(), time() + (3600 * 24 * 365), '/', '', true, true);
-        if ($isTfa) {
+        if ($isTfa && $twoFactorAuthAttempt->isDummy() === false) {
             $this->session->set('tfa_attempt_id', $twoFactorAuthAttempt->getId());
             $this->addLogForProvider($provider, 'Successfully logged in with two factor auth', $user->getId(), $this->session->getId());
         }
@@ -314,5 +318,47 @@ class UserAuthentication
             $previousReset->setDateExpires(new \DateTimeImmutable('now'));
             $this->savePasswordReset($previousReset);
         }
+    }
+
+    public function getOneTimeLinkByToken(string $token): ?LoginOneTimeLink
+    {
+        return $this->hydrator->hydrate(LoginOneTimeLink::class, $this->repository->getOneTimeLinkByToken($token));
+    }
+
+    public function getOneTimeLinkById(int $id): ?LoginOneTimeLink
+    {
+        return $this->hydrator->hydrate(LoginOneTimeLink::class, $this->repository->getOneTimeLinkById($id));
+    }
+
+    public function createOneTimeLinkForUser(User $user, \DateTimeInterface $expiry = new \DateTime('+1 hour')): LoginOneTimeLink
+    {
+        $link = new LoginOneTimeLink();
+        $link->setUser($user);
+        $link->setDateCreated(new \DateTimeImmutable());
+        $link->setDateExpires($expiry);
+        $token = StringUtilities::generateRandomToken(50);
+        while ($this->getOneTimeLinkByToken($token) === null) {
+            $token = StringUtilities::generateRandomToken(50);
+        }
+        $link->setToken($token);
+        $link->setDeleted(false);
+        $this->repository->saveOneTimeLink($link);
+        return $link;
+    }
+
+    public function saveOneTomeLink(LoginOneTimeLink $link): void
+    {
+        $previous = $link->getId() ? $this->getOneTimeLinkById($link->getId()) : null;
+        $event = new PreLoginOneTimeLinkEvent();
+        $event->setCurrent($link);
+        $event->setPrevious($previous);
+        $this->dispatcher->dispatch($event);
+
+        $this->repository->saveOneTimeLink($link);
+
+        $event = new PostLoginOneTimeLinkEvent();
+        $event->setCurrent($link);
+        $event->setPrevious($previous);
+        $this->dispatcher->dispatch($event);
     }
 }

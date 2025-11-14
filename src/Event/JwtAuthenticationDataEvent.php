@@ -8,6 +8,9 @@ use Pantono\Authentication\Model\User;
 class JwtAuthenticationDataEvent extends Event
 {
     private User $user;
+    /**
+     * @var array<mixed>
+     */
     private array $data = [];
 
     public function __construct(User $user)

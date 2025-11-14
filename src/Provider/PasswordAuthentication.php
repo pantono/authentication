@@ -14,7 +14,7 @@ use Pantono\Authentication\Exception\PasswordAuthNotAvailableException;
 
 class PasswordAuthentication extends AbstractAuthenticationProvider
 {
-    public function initiateLogin(): ?string
+    public function initiateLogin(array $parameters = []): ?string
     {
         //No initiate needed for password auth
         return null;

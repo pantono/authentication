@@ -25,7 +25,7 @@ class AppleAuthProvider extends AbstractAuthenticationProvider
      */
     private array $scopes = ['name', 'email'];
 
-    public function initiateLogin(): ?string
+    public function initiateLogin(array $parameters = []): ?string
     {
         $state = $this->getAppleClient()->getState();
         $this->authentication->addLogForProvider($this->getProviderConfig(), 'Initiating login with apple', null, $this->getSession()->getId(), ['state' => $state]);

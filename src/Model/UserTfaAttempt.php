@@ -6,6 +6,7 @@ use Pantono\Database\Traits\SavableModel;
 use Pantono\Contracts\Attributes\Locator;
 use Pantono\Authentication\TwoFactorAuth;
 use Pantono\Contracts\Attributes\FieldName;
+use Pantono\Contracts\Attributes\NoSave;
 
 #[Locator(methodName: 'getAttemptById', className: TwoFactorAuth::class)]
 class UserTfaAttempt
@@ -20,6 +21,8 @@ class UserTfaAttempt
     private string $attemptCode;
     private string $attemptSlug;
     private bool $verified = false;
+    #[NoSave]
+    private bool $dummy = false;
 
     public function getId(): ?int
     {
@@ -89,5 +92,15 @@ class UserTfaAttempt
     public function setVerified(bool $verified): void
     {
         $this->verified = $verified;
+    }
+
+    public function isDummy(): bool
+    {
+        return $this->dummy;
+    }
+
+    public function setDummy(bool $dummy): void
+    {
+        $this->dummy = $dummy;
     }
 }

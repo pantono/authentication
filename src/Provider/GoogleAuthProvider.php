@@ -25,7 +25,7 @@ class GoogleAuthProvider extends AbstractAuthenticationProvider
      */
     private array $scopes = ['profile', 'email', 'openid'];
 
-    public function initiateLogin(): ?string
+    public function initiateLogin(array $parameters = []): ?string
     {
         $url = $this->getGoogleClient()->getAuthorizationUrl(['scopes' => $this->scopes]);
         $state = $this->getGoogleClient()->getState();
