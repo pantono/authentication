@@ -112,6 +112,7 @@ final class Authentication extends AbstractMigration
                         ['name' => 'client_secret', 'label' => 'Client Secret', 'type' => 'text', 'required' => true],
                         ['name' => 'redirect_uri', 'label' => 'Redirect URI', 'type' => 'text', 'required' => true],
                     ])],
+                    ['name' => 'Magic Link', 'provider_class' => 'Pantono\Authentication\Provider\MagicLinkProvider', 'allows_registration' => 0, 'required_fields' => json_encode([])],
                 ])->saveData();
         }
 
