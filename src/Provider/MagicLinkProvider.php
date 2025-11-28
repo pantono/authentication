@@ -60,6 +60,9 @@ class MagicLinkProvider extends AbstractAuthenticationProvider
         if ($token->getDateExpires() <= new \DateTimeImmutable()) {
             throw new MagicLinkExpired('Magic link has expired');
         }
+        if ($token->getDateLoggedIn()) {
+            throw new MagicLinkExpired('Magic link has already been used');
+        }
         $user = $token->getUser();
         if (!$user) {
             throw new UserDoesNotExistException('User does not exist');
