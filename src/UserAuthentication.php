@@ -337,7 +337,7 @@ class UserAuthentication
         $link->setDateCreated(new \DateTimeImmutable());
         $link->setDateExpires($expiry);
         $token = StringUtilities::generateRandomToken(50);
-        while ($this->getOneTimeLinkByToken($token) === null) {
+        while ($this->getOneTimeLinkByToken($token) !== null) {
             $token = StringUtilities::generateRandomToken(50);
         }
         $link->setToken($token);
