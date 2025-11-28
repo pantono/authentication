@@ -35,11 +35,11 @@ class MagicLinkProvider extends AbstractAuthenticationProvider
             }
         }
         if ($expiry !== null) {
-            $this->authentication->createOneTimeLinkForUser($user, $expiry);
+            $link = $this->authentication->createOneTimeLinkForUser($user, $expiry);
         } else {
-            $this->authentication->createOneTimeLinkForUser($user);
+            $link = $this->authentication->createOneTimeLinkForUser($user);
         }
-        return null;
+        return $link->getToken();
     }
 
     public function initiateRegister(): ?string
