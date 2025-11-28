@@ -14,6 +14,7 @@ final class OneTimeLoginLinks extends AbstractMigration
             ->addColumn('date_expires', 'datetime')
             ->addColumn('date_logged_in', 'datetime', ['null' => true])
             ->addColumn('token', 'string')
+            ->addColumn('deleted', 'boolean')
             ->create();
     }
 }
