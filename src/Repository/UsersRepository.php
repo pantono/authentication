@@ -85,6 +85,11 @@ class UsersRepository extends MysqlRepository
         return $this->selectSingleRow('user_field_type', 'id', $id);
     }
 
+    public function getUserFieldTypeByName(string $name): ?array
+    {
+        return $this->selectSingleRow('user_field_type', 'name', $name);
+    }
+
     public function getUserByEmailAddress(string $emailAddress): ?array
     {
         return $this->selectSingleRow('user', 'email_address', $emailAddress);

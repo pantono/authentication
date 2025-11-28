@@ -123,6 +123,11 @@ class Users
         return $this->hydrator->hydrate(UserFieldType::class, $this->repository->getUserFieldTypeById($id));
     }
 
+    public function getUserFieldTypeByName(string $name): ?UserFieldType
+    {
+        return $this->hydrator->hydrate(UserFieldType::class, $this->repository->getUserFieldTypeByName($name));
+    }
+
     /**
      * @return UserField[]
      */
