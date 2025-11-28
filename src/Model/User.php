@@ -272,4 +272,12 @@ class User implements UserInterface
     {
         $this->verified = $verified;
     }
+
+    public function addField(UserFieldType $type, mixed $value): void
+    {
+        $userField = new UserField();
+        $userField->setType($type);
+        $userField->setValue($value);
+        $this->fields[] = $userField;
+    }
 }
