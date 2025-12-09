@@ -100,19 +100,21 @@ class UserAuthentication
 
     public function processLogout(): void
     {
-        $userId = $this->session->get('user_id');
-        $loginProvider = $this->session->get('login_provider');
-        $provider = null;
-        if ($loginProvider) {
-            $provider = $this->getLoginProviderById($loginProvider);
-        }
-        if ($userId) {
-            $this->addLogForProvider($provider, 'Logged out', $userId, $this->session->getId());;
-        }
         setcookie(self::COOKIE_NAME, '', time() - 3600, '/', '', true, true);
         $this->session->remove('user_id');
         $this->session->remove('login_provider');
         $this->session->remove('tfa_user_id');
+        $userId = $this->session->get('user_id');
+        if ($userId) {
+            $loginProvider = $this->session->get('login_provider');
+            $provider = null;
+            if ($loginProvider) {
+                $provider = $this->getLoginProviderById($loginProvider);
+            }
+            if ($userId) {
+                $this->addLogForProvider($provider, 'Logged out', $userId, $this->session->getId());;
+            }
+        }
     }
 
     public function getAuthenticationProvider(LoginProvider $loginProvider): AbstractAuthenticationProvider
