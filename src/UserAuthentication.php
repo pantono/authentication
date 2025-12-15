@@ -332,16 +332,26 @@ class UserAuthentication
         return $this->hydrator->hydrate(LoginOneTimeLink::class, $this->repository->getOneTimeLinkById($id));
     }
 
-    public function createOneTimeLinkForUser(User $user, \DateTimeInterface $expiry = new \DateTime('+1 hour')): LoginOneTimeLink
+    public function createOneTimeLinkForUser(User $user, \DateTimeInterface $expiry, string $codeGenerationMethod = 'link_code'): LoginOneTimeLink
     {
         $link = new LoginOneTimeLink();
         $link->setUser($user);
         $link->setDateCreated(new \DateTimeImmutable());
         $link->setDateExpires($expiry);
-        $token = str_replace('/', '', StringUtilities::generateRandomToken(50));
-        while ($this->getOneTimeLinkByToken($token) !== null) {
+        if ($codeGenerationMethod === 'link_code') {
             $token = str_replace('/', '', StringUtilities::generateRandomToken(50));
+            while ($this->getOneTimeLinkByToken($token) !== null) {
+                $token = str_replace('/', '', StringUtilities::generateRandomToken(50));
+            }
+        } elseif ($codeGenerationMethod === 'user_input') {
+            $token = strtoupper(StringUtilities::generateRandomString(6));
+            while ($this->getOneTimeLinkByToken($token) !== null) {
+                $token = strtoupper(StringUtilities::generateRandomString(6));
+            }
+        } else {
+            throw new \Exception('Invalid code generation method');
         }
+
         $link->setToken($token);
         $link->setDeleted(false);
         $this->repository->saveOneTimeLink($link);

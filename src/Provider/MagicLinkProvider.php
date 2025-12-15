@@ -16,7 +16,8 @@ class MagicLinkProvider extends AbstractAuthenticationProvider
     {
         $emailAddress = $parameters['email'] ?? null;
         $id = $parameters['user_id'] ?? null;
-        $expiry = $parameters['expiry'] ?? null;
+        $expiry = $parameters['expiry'] ?? '+1 hour';
+        $codeType = $parameters['code_type'] ?? null;
         if ($id) {
             $user = $this->users->getUserById($id);
         } else if ($emailAddress) {
@@ -34,11 +35,12 @@ class MagicLinkProvider extends AbstractAuthenticationProvider
                 $expiry = null;
             }
         }
-        if ($expiry !== null) {
-            $link = $this->authentication->createOneTimeLinkForUser($user, $expiry);
-        } else {
-            $link = $this->authentication->createOneTimeLinkForUser($user);
+        try {
+            $expiryDate = new \DateTime($expiry);
+        } catch (\Exception $e) {
+            $expiryDate = new \DateTime('+1 hour');
         }
+        $link = $this->authentication->createOneTimeLinkForUser($user, $expiryDate, $codeType);
         return $link->getToken();
     }
 
