@@ -172,7 +172,7 @@ class UserAuthentication
             'exp' => $expiry->format('U'),
             'roles' => $user->getPermissionList(),
             'name' => $user->getName(),
-            'groups' => $user->getGroups()
+            'groups' => $user->getGroupNames()
         ]);
         $this->dispatcher->dispatch($event);
         return JWT::encode($event->getData(), $this->getJwtSecret(), 'HS256');
