@@ -8,3 +8,5 @@ Users:
   class: Pantono\Authentication\Users
 TwoFactorAuth:
   class: Pantono\Authentication\TwoFactorAuth
+Verification:
+  class: Pantono\Authentication\Verification
