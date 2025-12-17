@@ -49,7 +49,7 @@ class LoginProvider
         $this->config = $config;
     }
 
-    public function getConfigField(string $string): ?string
+    public function getConfigField(string $string): mixed
     {
         return $this->getConfig()[$string] ?? null;
     }

@@ -101,7 +101,9 @@ final class Authentication extends AbstractMigration
         if ($this->isMigratingUp()) {
             $this->table('login_provider_type')
                 ->insert([
-                    ['name' => 'Username & Password', 'provider_class' => 'Pantono\Authentication\Provider\PasswordAuthentication', 'allows_registration' => 1, 'required_fields' => json_encode([])],
+                    ['name' => 'Username & Password', 'provider_class' => 'Pantono\Authentication\Provider\PasswordAuthentication', 'allows_registration' => 1, 'required_fields' => json_encode([
+                        ['name' => 'requires_verification', 'label' => 'Requires Email Verification', 'type' => 'boolean', 'required' => true],
+                    ])],
                     ['name' => 'Login with google', 'provider_class' => 'Pantono\Authentication\Provider\GoogleAuthProvider', 'allows_registration' => 1, 'required_fields' => json_encode([
                         ['name' => 'client_id', 'label' => 'Client ID', 'type' => 'text', 'required' => true],
                         ['name' => 'client_secret', 'label' => 'Client Secret', 'type' => 'text', 'required' => true],

@@ -11,6 +11,7 @@ use Pantono\Authentication\Exception\EmailAlreadyExists;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Pantono\Hydrator\Locator\StaticLocator;
 use Pantono\Authentication\Exception\PasswordAuthNotAvailableException;
+use Pantono\Authentication\Exception\UserAccountNotVerified;
 
 class PasswordAuthentication extends AbstractAuthenticationProvider
 {
@@ -30,6 +31,7 @@ class PasswordAuthentication extends AbstractAuthenticationProvider
     {
         $password = $options['password'] ?? null;
         $username = $options['username'] ?? null;
+        $requiresVerification = $this->getProviderConfig()->getConfigField('requires_verification');
         if (!$username) {
             throw new \InvalidArgumentException('Username is required');
         }
@@ -51,6 +53,10 @@ class PasswordAuthentication extends AbstractAuthenticationProvider
         if (password_needs_rehash($user->getPassword(), PASSWORD_DEFAULT) === true) {
             $this->authentication->addLogForProvider($this->getProviderConfig(), 'Password re-hashed', $user->getId(), $this->getSession()->getId());
             $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
+        }
+        if ($requiresVerification === true && !$user->isVerified()) {
+            $this->authentication->addLogForProvider($this->getProviderConfig(), 'User tried to login before verification', $user->getId(), $this->getSession()->getId());
+            throw new UserAccountNotVerified('Your account must be verified before logging in');
         }
         $user->setDateLastLogin(new \DateTimeImmutable());
         $this->users->saveUser($user);

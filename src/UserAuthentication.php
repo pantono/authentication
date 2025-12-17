@@ -111,7 +111,7 @@ class UserAuthentication
             if ($loginProvider) {
                 $provider = $this->getLoginProviderById($loginProvider);
             }
-            if ($userId) {
+            if ($provider) {
                 $this->addLogForProvider($provider, 'Logged out', $userId, $this->session->getId());;
             }
         }
