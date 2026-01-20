@@ -2,16 +2,15 @@
 
 namespace Pantono\Authentication\Repository;
 
-use Pantono\Database\Repository\MysqlRepository;
 use Pantono\Authentication\Model\UserToken;
 use Pantono\Authentication\Model\LoginProviderUser;
 use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Model\LoginProvider;
 use Pantono\Authentication\Model\UserPasswordReset;
-use Pantono\Authentication\Model\User;
 use Pantono\Authentication\Model\LoginOneTimeLink;
+use Pantono\Database\Repository\DefaultRepository;
 
-class UserAuthenticationRepository extends MysqlRepository
+class UserAuthenticationRepository extends DefaultRepository
 {
     public function getUserByToken(string $token): ?array
     {

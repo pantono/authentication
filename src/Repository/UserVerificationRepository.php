@@ -2,11 +2,11 @@
 
 namespace Pantono\Authentication\Repository;
 
-use Pantono\Database\Repository\MysqlRepository;
 use Pantono\Authentication\Model\User;
 use Pantono\Authentication\Model\UserVerification;
+use Pantono\Database\Repository\DefaultRepository;
 
-class UserVerificationRepository extends MysqlRepository
+class UserVerificationRepository extends DefaultRepository
 {
     public function getVerificationsForUser(User $user): ?array
     {

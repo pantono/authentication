@@ -2,10 +2,10 @@
 
 namespace Pantono\Authentication\Repository;
 
-use Pantono\Database\Repository\MysqlRepository;
+use Pantono\Database\Repository\DefaultRepository;
 use Pantono\Authentication\Model\ApiToken;
 
-class ApiAuthenticationRepository extends MysqlRepository
+class ApiAuthenticationRepository extends DefaultRepository
 {
     public function getApiTokenByToken(string $token): ?array
     {

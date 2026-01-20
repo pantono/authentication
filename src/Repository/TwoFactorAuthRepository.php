@@ -2,12 +2,12 @@
 
 namespace Pantono\Authentication\Repository;
 
-use Pantono\Database\Repository\MysqlRepository;
 use Pantono\Authentication\Model\User;
 use Pantono\Authentication\Model\UserTfaMethod;
 use Pantono\Authentication\Model\UserTfaAttempt;
+use Pantono\Database\Repository\DefaultRepository;
 
-class TwoFactorAuthRepository extends MysqlRepository
+class TwoFactorAuthRepository extends DefaultRepository
 {
     public function getTypeById(int $id): ?array
     {

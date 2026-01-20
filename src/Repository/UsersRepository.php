@@ -2,14 +2,13 @@
 
 namespace Pantono\Authentication\Repository;
 
-use Pantono\Database\Repository\MysqlRepository;
-use Pantono\Authentication\Model\UserToken;
+use Pantono\Database\Repository\DefaultRepository;
 use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Model\User;
 use Pantono\Authentication\Filter\UserFilter;
 use Pantono\Authentication\Filter\UserHistoryFilter;
 
-class UsersRepository extends MysqlRepository
+class UsersRepository extends DefaultRepository
 {
     public function getUserById(int $id): ?array
     {
