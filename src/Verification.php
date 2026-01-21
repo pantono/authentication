@@ -106,7 +106,7 @@ class Verification
     private function getUniqueCode(): string
     {
         $code = StringUtilities::generateRandomString(6);
-        while (!$this->repository->getVerificationByCode($code)) {
+        while ($this->repository->getVerificationByCode($code)) {
             $code = StringUtilities::generateRandomString(6);
         }
         return $code;
@@ -115,7 +115,7 @@ class Verification
     private function getUniqueToken(): string
     {
         $token = StringUtilities::generateRandomToken();
-        while (!$this->repository->getVerificationByToken($token)) {
+        while ($this->repository->getVerificationByToken($token)) {
             $token = StringUtilities::generateRandomToken();
         }
         return $token;
