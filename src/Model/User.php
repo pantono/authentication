@@ -21,8 +21,8 @@ class User implements UserInterface
     private ?\DateTimeInterface $dateLastLogin = null;
 
     private string $emailAddress;
-    private string $forename;
-    private string $surname;
+    private ?string $forename = null;
+    private ?string $surname = null;
     private ?string $password = null;
     private bool $deleted;
     private bool $disabled;
@@ -85,22 +85,22 @@ class User implements UserInterface
         $this->emailAddress = $emailAddress;
     }
 
-    public function getForename(): string
+    public function getForename(): ?string
     {
         return $this->forename;
     }
 
-    public function setForename(string $forename): void
+    public function setForename(?string $forename): void
     {
         $this->forename = $forename;
     }
 
-    public function getSurname(): string
+    public function getSurname(): ?string
     {
         return $this->surname;
     }
 
-    public function setSurname(string $surname): void
+    public function setSurname(?string $surname): void
     {
         $this->surname = $surname;
     }
