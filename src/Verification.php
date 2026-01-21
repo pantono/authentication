@@ -44,7 +44,7 @@ class Verification
         return $this->hydrator->hydrate(UserVerification::class, $this->repository->getVerificationById($id));
     }
 
-    public function initiateVerification(User $user, UserVerificationType $type): UserVerification
+    public function initiateVerification(User $user, UserVerificationType $type, ?string $credential = null): UserVerification
     {
         $verification = new UserVerification();
         $verification->setDateCreated(new \DateTimeImmutable());
@@ -53,6 +53,10 @@ class Verification
         $verification->setToken($this->getUniqueToken());
         $verification->setUser($user);
         $verification->setVerified(false);
+        if (!$credential) {
+            $credential = $user->getEmailAddress();
+        }
+        $verification->setCredential($credential);
         $verification->setType($type);
         $this->saveUserVerification($verification);
         $this->getVerificationController($type)->initiate($verification);
