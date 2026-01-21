@@ -6,6 +6,8 @@ use Phinx\Migration\AbstractMigration;
 
 final class Authentication extends AbstractMigration
 {
+    use \Pantono\Database\Migration\Traits\ReseedIdentityTrait;
+
     public function change(): void
     {
         $this->table('permission')
@@ -168,6 +170,7 @@ final class Authentication extends AbstractMigration
                     ['id' => 1, 'email_address' => 'unknown@user', 'forename' => 'Unknown', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => '', 'system_user' => 1],
                     ['id' => 2, 'email_address' => 'system@user', 'forename' => 'System', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => '', 'system_user' => 1],
                 ])->saveData();
+            $this->reseedIdentity('user');
         }
 
         $this->table('tfa_type')
@@ -184,6 +187,7 @@ final class Authentication extends AbstractMigration
                     ['id' => 2, 'name' => 'SMS', 'description' => 'An SMS sent to your mobile phone', 'enabled' => 0, 'controller' => 'Pantono\Authentication\Provider\Tfa\SmsTfaProvider', 'config' => json_encode(['verification_required' => true, 'sid' => '', 'token' => '', 'from_number' => ''])],
                     ['id' => 3, 'name' => 'TOTP', 'description' => 'A time-based one-time password', 'enabled' => 0, 'controller' => 'Pantono\Authentication\Provider\Tfa\TotpTfaProvider', 'config' => json_encode(['qr_label' => 'Pantono'])],
                 ])->save();
+            $this->reseedIdentity('tfa_type');
         }
 
         $this->table('user_tfa_method')
@@ -228,6 +232,7 @@ final class Authentication extends AbstractMigration
                     ['id' => 2, 'name' => 'SMS', 'enabled' => 0, 'controller' => 'Pantono\Authentication\VerificationController\SmsVerificationController'],
                     ['id' => 3, 'name' => 'WhatsApp', 'enabled' => 0, 'controller' => 'Pantono\Authentication\VerificationController\WhatsAppVerificationController'],
                 ])->saveData();
+            $this->reseedIdentity('user_verification_type');
         }
 
         $this->table('user_verification')
