@@ -32,7 +32,7 @@ class UsersRepository extends DefaultRepository
     public function getGroupsForUser(UserInterface $user): array
     {
         $select = $this->getDb()->select()->from('user_group', [])
-            ->joinInner(['g' => $this->quoteTable('group')], 'user_group.group_id=g.id')
+            ->joinInner(['g' => 'group'], 'user_group.group_id=g.id')
             ->where('user_group.user_id=?', $user->getId());
         return $this->getDb()->fetchAll($select);
     }
