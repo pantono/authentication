@@ -20,7 +20,7 @@ class CreateApiToken extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure():void
     {
         $this->setName('api:token:create')
             ->addOption('application_name', 'name', InputOption::VALUE_OPTIONAL, 'Application Name');

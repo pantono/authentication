@@ -3,12 +3,11 @@
   "description": "Authentication Module for Pantono",
   "type": "library",
   "require": {
-    "php": ">=8.2",
+    "php": ">=8.4",
     "symfony/console": "^8.0",
     "pantono/database": "^1.0",
     "pantono/contracts": "^1.0",
     "pantono/hydrator": "^1.0",
-    "symfony/event-dispatcher": "^8.0",
     "league/oauth2-google": "^4.0",
     "league/oauth2-client": "^2.8",
     "pantono/utilities": "^1.0",
