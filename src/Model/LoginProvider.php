@@ -3,15 +3,15 @@
 namespace Pantono\Authentication\Model;
 
 use Pantono\Contracts\Attributes\Filter;
-use Pantono\Authentication\UserAuthentication;
-use Pantono\Contracts\Attributes\Locator;
 use Pantono\Contracts\Attributes\FieldName;
+use Pantono\Contracts\Attributes\DatabaseTable;
+use Pantono\Contracts\Attributes\Database\OneToOne;
 
-#[Locator(methodName: 'getProviderById', className: UserAuthentication::class)]
+#[DatabaseTable('login_provider')]
 class LoginProvider
 {
     private ?int $id = null;
-    #[Locator(methodName: 'getProviderTypeById', className: UserAuthentication::class), FieldName('type_id')]
+    #[OneToOne(LoginProviderType::class), FieldName('type_id')]
     private ?LoginProviderType $type = null;
     /**
      * @var array<string,mixed>

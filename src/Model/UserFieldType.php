@@ -2,10 +2,9 @@
 
 namespace Pantono\Authentication\Model;
 
-use Pantono\Contracts\Attributes\Locator;
-use Pantono\Authentication\Users;
+use Pantono\Contracts\Attributes\DatabaseTable;
 
-#[Locator(methodName: 'getUserFieldTypeById', className: Users::class)]
+#[DatabaseTable('user_field_type')]
 class UserFieldType
 {
     private ?int $id = null;

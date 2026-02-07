@@ -3,11 +3,10 @@
 namespace Pantono\Authentication\Model;
 
 use Pantono\Database\Traits\SavableModel;
-use Pantono\Contracts\Attributes\Locator;
-use Pantono\Authentication\TwoFactorAuth;
 use Pantono\Contracts\Attributes\Filter;
+use Pantono\Contracts\Attributes\DatabaseTable;
 
-#[Locator(methodName: 'getTypeById', className: TwoFactorAuth::class)]
+#[DatabaseTable('tfa_type')]
 class TfaType
 {
     use SavableModel;

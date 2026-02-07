@@ -3,16 +3,17 @@
 namespace Pantono\Authentication\Model;
 
 use Pantono\Database\Traits\SavableModel;
-use Pantono\Contracts\Attributes\Locator;
-use Pantono\Authentication\Users;
 use Pantono\Contracts\Attributes\FieldName;
+use Pantono\Contracts\Attributes\DatabaseTable;
+use Pantono\Contracts\Attributes\Database\OneToOne;
 
+#[DatabaseTable('user_password_reset')]
 class UserPasswordReset
 {
     use SavableModel;
 
     private ?int $id = null;
-    #[Locator(methodName: 'getUserById', className: Users::class), FieldName('user_id')]
+    #[OneToOne(User::class), FieldName('user_id')]
     private ?User $user = null;
     private string $token;
     private \DateTimeInterface $dateCreated;

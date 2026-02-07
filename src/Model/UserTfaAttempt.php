@@ -3,18 +3,18 @@
 namespace Pantono\Authentication\Model;
 
 use Pantono\Database\Traits\SavableModel;
-use Pantono\Contracts\Attributes\Locator;
-use Pantono\Authentication\TwoFactorAuth;
 use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Contracts\Attributes\NoSave;
+use Pantono\Contracts\Attributes\DatabaseTable;
+use Pantono\Contracts\Attributes\Database\OneToOne;
 
-#[Locator(methodName: 'getAttemptById', className: TwoFactorAuth::class)]
+#[DatabaseTable('user_tfa_attempt')]
 class UserTfaAttempt
 {
     use SavableModel;
 
     private ?int $id = null;
-    #[Locator(methodName: 'getMethodById', className: TwoFactorAuth::class), FieldName('method_id')]
+    #[OneToOne(UserTfaMethod::class), FieldName('method_id')]
     private ?UserTfaMethod $method = null;
     private \DateTimeInterface $dateCreated;
     private \DateTimeInterface $dateExpires;

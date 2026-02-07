@@ -3,20 +3,20 @@
 namespace Pantono\Authentication\Model;
 
 use Pantono\Contracts\Attributes\Lazy;
-use Pantono\Contracts\Attributes\Locator;
-use Pantono\Authentication\UserAuthentication;
 use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Database\Traits\SavableModel;
 use Pantono\Contracts\Attributes\Filter;
+use Pantono\Contracts\Attributes\DatabaseTable;
+use Pantono\Contracts\Attributes\Database\OneToOne;
 
-#[Locator(methodName: 'getLoginProviderUserById', className: UserAuthentication::class)]
+#[DatabaseTable('login_provider_user')]
 class LoginProviderUser
 {
     use SavableModel;
 
     private ?int $id = null;
     private ?int $userId = null;
-    #[Lazy, Locator(methodName: 'getProviderById', className: UserAuthentication::class), FieldName('provider_id')]
+    #[OneToOne(LoginProvider::class), FieldName('provider_id'), Lazy]
     private ?LoginProvider $provider = null;
     private string $providerUserId;
     private string $accessToken;

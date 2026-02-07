@@ -2,6 +2,9 @@
 
 namespace Pantono\Authentication\Model;
 
+use Pantono\Contracts\Attributes\DatabaseTable;
+
+#[DatabaseTable('user_verification_type')]
 class UserVerificationType
 {
     private ?int $id = null;

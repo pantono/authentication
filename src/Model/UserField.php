@@ -3,15 +3,16 @@
 namespace Pantono\Authentication\Model;
 
 use Pantono\Utilities\DateTimeParser;
-use Pantono\Contracts\Attributes\Locator;
-use Pantono\Authentication\Users;
 use Pantono\Contracts\Attributes\FieldName;
+use Pantono\Contracts\Attributes\DatabaseTable;
+use Pantono\Contracts\Attributes\Database\OneToOne;
 
+#[DatabaseTable('user_field')]
 class UserField
 {
     private ?int $id = null;
     private int $userId;
-    #[Locator(methodName: 'getUserFieldTypeById', className: Users::class), FieldName('field_type_id')]
+    #[OneToOne(UserFieldType::class), FieldName('field_type_id')]
     private ?UserFieldType $type = null;
     private mixed $value;
 

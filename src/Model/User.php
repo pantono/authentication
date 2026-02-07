@@ -6,12 +6,13 @@ use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Exception\PasswordNeedsRehashException;
 use Pantono\Database\Traits\SavableModel;
 use Pantono\Contracts\Attributes\Locator;
-use Pantono\Authentication\UserAuthentication;
 use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Authentication\Users;
 use Pantono\Authentication\Exception\PasswordAuthNotAvailableException;
+use Pantono\Contracts\Attributes\DatabaseTable;
+use Pantono\Contracts\Attributes\Database\OneToMany;
 
-#[Locator(methodName: 'getUserById', className: Users::class)]
+#[DatabaseTable('user')]
 class User implements UserInterface
 {
     use SavableModel;
@@ -39,7 +40,7 @@ class User implements UserInterface
     /**
      * @var UserField[]
      */
-    #[Locator(methodName: 'getFieldsForUser', className: Users::class), FieldName('$this')]
+    #[OneToMany(targetModel: UserField::class, mappedBy: 'user_id'), FieldName('$this')]
     private array $fields = [];
     private bool $tfaEnabled = false;
     private bool $systemUser = false;

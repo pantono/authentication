@@ -2,10 +2,9 @@
 
 namespace Pantono\Authentication\Model;
 
-use Pantono\Contracts\Attributes\Locator;
-use Pantono\Authentication\Users;
+use Pantono\Contracts\Attributes\DatabaseTable;
 
-#[Locator(methodName: 'getGroupById', className: Users::class)]
+#[DatabaseTable('group')]
 class Group
 {
     private ?int $id = null;

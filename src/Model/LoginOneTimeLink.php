@@ -2,17 +2,18 @@
 
 namespace Pantono\Authentication\Model;
 
-use Pantono\Contracts\Attributes\Locator;
-use Pantono\Authentication\Users;
 use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Database\Traits\SavableModel;
+use Pantono\Contracts\Attributes\DatabaseTable;
+use Pantono\Contracts\Attributes\Database\OneToOne;
 
+#[DatabaseTable('login_one_time_link')]
 class LoginOneTimeLink
 {
     use SavableModel;
 
     private ?int $id = null;
-    #[Locator(methodName: 'getUserById', className: Users::class), FieldName('user_id')]
+    #[OneToOne(User::class), FieldName('user_id')]
     private ?User $user = null;
     private \DateTimeInterface $dateCreated;
     private \DateTimeInterface $dateExpires;

@@ -7,7 +7,9 @@ use Pantono\Contracts\Attributes\Locator;
 use Pantono\Authentication\Verification;
 use Pantono\Database\Traits\SavableModel;
 use Pantono\Authentication\Users;
+use Pantono\Contracts\Attributes\DatabaseTable;
 
+#[DatabaseTable('user_verification')]
 class UserVerification
 {
     use SavableModel;

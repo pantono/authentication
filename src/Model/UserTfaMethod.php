@@ -3,13 +3,12 @@
 namespace Pantono\Authentication\Model;
 
 use Pantono\Database\Traits\SavableModel;
-use Pantono\Contracts\Attributes\Locator;
-use Pantono\Authentication\Users;
 use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Contracts\Attributes\Lazy;
-use Pantono\Authentication\TwoFactorAuth;
+use Pantono\Contracts\Attributes\DatabaseTable;
+use Pantono\Contracts\Attributes\Database\OneToOne;
 
-#[Locator(methodName: 'getUserMethodById', className: TwoFactorAuth::class)]
+#[DatabaseTable('user_tfa_method')]
 class UserTfaMethod
 {
     use SavableModel;
@@ -18,9 +17,9 @@ class UserTfaMethod
     private \DateTimeInterface $dateCreated;
     private ?\DateTimeInterface $dateLastUsed = null;
     private int $userId;
-    #[Locator(methodName: 'getUserById', className: Users::class), FieldName('user_id'), Lazy]
+    #[OneToOne(User::class), FieldName('user_id'), Lazy]
     private ?User $user = null;
-    #[Locator(methodName: 'getTypeById', className: TwoFactorAuth::class), FieldName('type_id')]
+    #[OneToOne(TfaType::class), FieldName('type_id')]
     private ?TfaType $tfaType = null;
     /**
      * @var array<string,mixed>

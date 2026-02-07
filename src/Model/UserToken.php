@@ -7,10 +7,10 @@ use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Contracts\Attributes\NoSave;
 use Pantono\Database\Traits\SavableModel;
 use Pantono\Contracts\Attributes\Lazy;
-use Pantono\Authentication\UserAuthentication;
 use Pantono\Authentication\Users;
+use Pantono\Contracts\Attributes\DatabaseTable;
 
-#[Locator(methodName: 'getUserTokenById', className: UserAuthentication::class)]
+#[DatabaseTable('user_token')]
 class UserToken
 {
     use SavableModel;

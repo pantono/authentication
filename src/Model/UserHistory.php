@@ -4,7 +4,9 @@ namespace Pantono\Authentication\Model;
 
 use Pantono\Contracts\Attributes\NoSave;
 use Pantono\Contracts\Attributes\Filter;
+use Pantono\Contracts\Attributes\DatabaseTable;
 
+#[DatabaseTable('user_history')]
 class UserHistory
 {
     private ?int $id = null;

@@ -2,10 +2,9 @@
 
 namespace Pantono\Authentication\Model;
 
-use Pantono\Contracts\Attributes\Locator;
-use Pantono\Authentication\Users;
+use Pantono\Contracts\Attributes\DatabaseTable;
 
-#[Locator(methodName: 'getPermissionById', className: Users::class)]
+#[DatabaseTable('permission')]
 class Permission
 {
     private ?int $id = null;
