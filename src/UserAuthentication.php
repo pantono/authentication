@@ -316,6 +316,9 @@ class UserAuthentication
         $filter->setDateExpiresStart(new \DateTimeImmutable('now'));
         $filter->setPerPage(999999);
         foreach ($this->getPasswordResetsByFilter($filter) as $previousReset) {
+            if ($previousReset->getId() === $reset->getId()) {
+                continue;
+            }
             $previousReset->setCompleted(true);
             $previousReset->setDateExpires(new \DateTimeImmutable('now'));
             $this->savePasswordReset($previousReset);
