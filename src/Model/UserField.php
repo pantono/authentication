@@ -14,7 +14,7 @@ class UserField
     private int $userId;
     #[OneToOne(UserFieldType::class), FieldName('field_type_id')]
     private ?UserFieldType $type = null;
-    private mixed $value;
+    private mixed $value = null;
 
     public function getId(): ?int
     {
