@@ -30,7 +30,7 @@ use Pantono\Authentication\Event\JwtAuthenticationDataEvent;
 use Pantono\Authentication\Model\LoginOneTimeLink;
 use Pantono\Authentication\Event\PreLoginOneTimeLinkEvent;
 use Pantono\Authentication\Event\PostLoginOneTimeLinkEvent;
-use Pantono\Authentication\Exception\AccessDeniedException;
+use Pantono\Authentication\Event\PostUserLoginEvent;
 
 class UserAuthentication
 {
@@ -95,6 +95,12 @@ class UserAuthentication
             $this->session->set('tfa_attempt_id', $twoFactorAuthAttempt->getId());
             $this->addLogForProvider($provider, 'Successfully logged in with two factor auth', $user->getId(), $this->session->getId());
         }
+        $event = new PostUserLoginEvent();
+        $event->setUser($user);
+        $event->setProvider($provider);
+        $event->setTfaAttempt($twoFactorAuthAttempt);
+        $event->setSession($this->session);
+        $this->dispatcher->dispatch($event);
         $this->addLogForProvider($provider, 'Successfully logged in', $user->getId(), $this->session->getId());
     }
 
