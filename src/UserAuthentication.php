@@ -31,6 +31,7 @@ use Pantono\Authentication\Model\LoginOneTimeLink;
 use Pantono\Authentication\Event\PreLoginOneTimeLinkEvent;
 use Pantono\Authentication\Event\PostLoginOneTimeLinkEvent;
 use Pantono\Authentication\Event\PostUserLoginEvent;
+use Pantono\Authentication\Event\PostUserLogoutEvent;
 
 class UserAuthentication
 {
@@ -119,6 +120,14 @@ class UserAuthentication
             }
             if ($provider) {
                 $this->addLogForProvider($provider, 'Logged out', $userId, $this->session->getId());;
+            }
+            $user = $this->users->getUserById($userId);
+            if ($user) {
+                $event = new PostUserLogoutEvent();
+                $event->setUser($user);
+                $event->setProvider($provider);
+                $event->setSession($this->session);
+                $this->dispatcher->dispatch($event);
             }
         }
     }
