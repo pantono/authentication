@@ -17,9 +17,9 @@ class UsersRepository extends DefaultRepository
 
     public function getPermissionsForUser(UserInterface $user): array
     {
-        $select = $this->getDb()->select()->from('user_permission', [])
-            ->joinInner('permission', 'user_permission.permission_id=permission.id')
-            ->where('user_permission.user_id=?', $user->getId());
+        $select = $this->getDb()->select('p.*')->from('user_permission', 'up')
+            ->innerJoin('up', 'permission', 'p', 'up.permission_id=p.id')
+            ->where('up.user_id=?', $user->getId());
 
         return $this->getDb()->fetchAll($select);
     }
@@ -31,9 +31,10 @@ class UsersRepository extends DefaultRepository
 
     public function getGroupsForUser(UserInterface $user): array
     {
-        $select = $this->getDb()->select()->from('user_group', [])
-            ->joinInner(['g' => 'group'], 'user_group.group_id=g.id')
-            ->where('user_group.user_id=?', $user->getId());
+        $select = $this->getDb()->select('g.*')->from('user_group', 'ug')
+            ->innerJoin('ug', 'group', 'g', 'ug.group_id=g.id')
+            ->where('ug.user_id=?', $user->getId());
+
         return $this->getDb()->fetchAll($select);
     }
 
@@ -96,51 +97,60 @@ class UsersRepository extends DefaultRepository
 
     public function getUsersByFilter(UserFilter $filter): array
     {
-        $select = $this->getDb()->select()->from('user');
+        $select = $this->getDb()->select('u.*')->from('user', 'u');
 
         if ($filter->getSearch()) {
-            $select->where('(forename like ?', '%' . $filter->getSearch() . '%')
-                ->orWhere('surname like ?', '%' . $filter->getSearch() . '%')
-                ->orWhere('email_address like ?)', '%' . $filter->getSearch() . '%');
+            $select->where('(u.forename like :search OR u.surname like :search or u.email_address like :search)')
+                ->setParameter('search', '%' . $filter->getSearch() . '%');
         }
 
         if ($filter->getEmailAddress() !== null) {
-            $select->where('email_address like ?', '%' . $filter->getEmailAddress() . '%');
+            $select->where('u.email_address like :email_address')
+                ->setParameter('email_address', '%' . $filter->getEmailAddress() . '%');
         }
         if ($filter->getForename() !== null) {
-            $select->where('forename like ?', '%' . $filter->getForename() . '%');
+            $select->where('u.forename like :forename')
+                ->setParameter('forename', '%' . $filter->getForename() . '%');
         }
         if ($filter->getSurname() !== null) {
-            $select->where('surname like ?', '%' . $filter->getSurname() . '%');
+            $select->where('u.surname like :surname')
+                ->setParameter('surname', '%' . $filter->getSurname() . '%');
         }
 
         if ($filter->getPermission() !== null) {
-            $select->joinInner('user_permission', 'user_permission.user_id=user.id', [])
-                ->where('user_permission.permission_id=?', $filter->getPermission()->getId());
+            $select->innerJoin('u', 'user_permission', 'up', 'u.id=up.user_id')
+                ->where('up_permission_id=:permission_id')
+                ->setParameter('permission_id', $filter->getPermission()->getId());
         }
 
         if ($filter->getDateCreatedStart() !== null) {
-            $select->where('date_created >= ?', $filter->getDateCreatedStart()->format('Y-m-d H:i:s'));
+            $select->where('date_created >= :date_created_start')
+                ->setParameter('date_created_start', $filter->getDateCreatedStart()->format('Y-m-d H:i:s'));
         }
         if ($filter->getDateCreatedEnd() !== null) {
-            $select->where('date_created <= ?', $filter->getDateCreatedEnd()->format('Y-m-d H:i:s'));
+            $select->where('date_created <= :date_created_end')
+                ->setParameter('date_created_end', $filter->getDateCreatedEnd()->format('Y-m-d H:i:s'));
         }
 
         if ($filter->getDisabled() !== null) {
-            $select->where('disabled=?', $filter->getDisabled() ? 1 : 0);
+            $select->where('disabled=:disabled')
+                ->setParameter('disabled', $filter->getDisabled() ? 1 : 0);
         }
         if ($filter->getDeleted() !== null) {
-            $select->where('deleted=?', $filter->getDeleted() ? 1 : 0);
+            $select->where('deleted=:deleted')
+                ->setParameter('deleted', $filter->getDeleted() ? 1 : 0);
         }
 
         foreach ($filter->getFields() as $field) {
-            $select->joinInner(['field_' . $field => 'user_field'], 'field_' . $field . '.user_id=user.id', [])
-                ->joinInner(['field_type_' . $field => 'user_field_type'], 'field_type_.' . $field . '.id=user_field.field_type_id', [])
-                ->where('field_type_.' . $field . '.name=?', $field);
+            $fieldTable = 'field_' . $field;
+            $fieldTypTable = 'field_type_' . $field;
+            $select->innerJoin('u', 'user_field', $fieldTable, $fieldTable . '.user_id=u.id')
+                ->innerJoin($fieldTable, 'field_type', $fieldTypTable, $fieldTypTable . '.id=' . $fieldTable . '.field_type_id')
+                ->where($fieldTypTable . '.name=:field_name')
+                ->setParameter('field_name', $field);
         }
 
-        $filter->setTotalResults($this->getCount($select));
-        $select->limitPage($filter->getPage(), $filter->getPerPage());
+        $this->applyCountAndLimit($select, $filter);
 
         return $this->getDb()->fetchAll($select);
     }
@@ -173,36 +183,42 @@ class UsersRepository extends DefaultRepository
 
     public function getUserByField(string $field, mixed $value): ?array
     {
-        $select = $this->getDb()->select()->from('user')
-            ->joinInner('user_field', 'user.id=user_field.user_id', [])
-            ->joinInner('user_field_type', 'user_field_type.id=user_field.field_type_id', [])
-            ->where('user_field_type.name=?', $field)
-            ->where('user_field.value=?', $value);
+        $select = $this->getDb()->select('u.*')->from('user', 'u')
+            ->innerJoin('u', 'user_field', 'uf', 'u.id=uf.user_id')
+            ->innerJoin('uf', 'user_field_type', 'ut', 'uf.field_type_id=ut.id')
+            ->where('u.value=:value')
+            ->where('ut.name=:field')
+            ->setParameter('value', $value)
+            ->setParameter('field', $field);
 
-        return $this->selectSingleRowFromQuery($select);
+        return $this->getDb()->fetchRow($select);
     }
 
 
     public function getUserHistoryByFilter(UserHistoryFilter $filter): array
     {
-        $select = $this->getDb()->select()->from('user_history');
+        $select = $this->getDb()->select('uh.*')->from('user_history', 'uh');
 
         if ($filter->getUser() !== null) {
-            $select->where('user_history.target_user_id=?', $filter->getUser()->getId());
+            $select->where('uh.target_user_id=:target_user_id')
+                ->setParameter('target_user_id', $filter->getUser()->getId());
         }
         if ($filter->getStartDate() !== null) {
-            $select->where('user_history.date >= ?', $filter->getStartDate()->format('Y-m-d H:i:s'));
+            $select->where('uh.date >= :date_start')
+                ->setParameter('date_start', $filter->getStartDate()->format('Y-m-d H:i:s'));
         }
         if ($filter->getEndDate() !== null) {
-            $select->where('user_history.date <= ?', $filter->getEndDate()->format('Y-m-d H:i:s'));
+            $select->where('uh.date <= :date_end')
+                ->setParameter('date_end', $filter->getEndDate()->format('Y-m-d H:i:s'));
         }
         foreach ($filter->getFields() as $field) {
-            $select->where('user_history->>' . $field['name'] . ' = ?', $field['value']);
+            $param = 'field_' . $field['name'];
+            $select->where('uh.context->>' . $field['name'] . ' = :' . $param)
+                ->setParameter($param, $field['value']);
         }
 
-        $filter->setTotalResults($this->getCount($select));
-
-        $select->limitPage($filter->getPage(), $filter->getPerPage());
+        $this->applyCountAndLimit($select, $filter);
+        
         return $this->getDb()->fetchAll($select);
     }
 }

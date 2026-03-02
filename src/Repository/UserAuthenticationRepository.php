@@ -9,24 +9,23 @@ use Pantono\Authentication\Model\LoginProvider;
 use Pantono\Authentication\Model\UserPasswordReset;
 use Pantono\Authentication\Model\LoginOneTimeLink;
 use Pantono\Database\Repository\DefaultRepository;
+use Pantono\Authentication\Filter\PasswordResetFilter;
 
 class UserAuthenticationRepository extends DefaultRepository
 {
     public function getUserByToken(string $token): ?array
     {
-        $select = $this->getDb()->select()->from('user_token', [])
-            ->joinInner('user', 'user.id=user_token.user_id')
-            ->where('user_token.token=?', $token);
+        $select = $this->getDb()->select('user.*')->from('user_token', 'u')
+            ->innerJoin('u', 'user_token', 't', 'u.id=t.user_id')
+            ->where('t.token=:token')
+            ->setParameter('token', $token);
 
         return $this->getDb()->fetchRow($select);
     }
 
     public function getUserTokenByToken(string $token): ?array
     {
-        $select = $this->getDb()->select()->from('user_token')
-            ->where('token=?', $token);
-
-        return $this->getDb()->fetchRow($select);
+        return $this->selectSingleRow('user_token', $token);
     }
 
     public function saveToken(UserToken $token): void
@@ -58,10 +57,12 @@ class UserAuthenticationRepository extends DefaultRepository
 
     public function getUserByProviderLogin(LoginProvider $provider, string $providerUserId): ?array
     {
-        $select = $this->getDb()->select()->from('login_provider_user', [])
-            ->joinInner('user', 'user.id=login_provider_user.user_id')
-            ->where('login_provider_user.provider_id=?', $provider->getId())
-            ->where('login_provider_user.provider_user_id=?', $providerUserId);
+        $select = $this->getDb()->select('lp.*')->from('login_provider_user', 'lp')
+            ->innerJoin('lp', 'user', 'u', 'u.id=lp.user_id')
+            ->where('lp.provider_id=:provider_id')
+            ->where('lp.provider_user_id=:provider_user_id')
+            ->setParameter('provider_id', $provider->getId())
+            ->setParameter('provider_user_id', $providerUserId);
 
         return $this->getDb()->fetchRow($select);
     }
@@ -119,30 +120,35 @@ class UserAuthenticationRepository extends DefaultRepository
         }
     }
 
-    public function getPasswordResetsByFilter(\Pantono\Authentication\Filter\PasswordResetFilter $filter): array
+    public function getPasswordResetsByFilter(PasswordResetFilter $filter): array
     {
-        $select = $this->getDb()->select()->from('user_password_reset');
+        $select = $this->getDb()->select('upr.*')->from('user_password_reset', 'upr');
 
         if ($filter->getUser()) {
-            $select->where('user_id=?', $filter->getUser()->getId());
+            $select->where('upr.user_id=:user_id')
+                ->setParameter('user_id', $filter->getUser()->getId());
         }
         if ($filter->getCompleted() !== null) {
-            $select->where('completed=?', $filter->getCompleted() ? 1 : 0);
+            $select->where('upr.completed=:completed')
+                ->setParameter('completed', $filter->getCompleted() ? 1 : 0);
         }
         if ($filter->getDateCreatedStart() !== null) {
-            $select->where('date_created >= ?', $filter->getDateCreatedStart()->format('Y-m-d H:i:s'));
+            $select->where('date_created >= :date_created_start')
+                ->set('date_created_start', $filter->getDateCreatedStart()->format('Y-m-d H:i:s'));
         }
         if ($filter->getDateCreatedEnd() !== null) {
-            $select->where('date_created <= ?', $filter->getDateCreatedEnd()->format('Y-m-d H:i:s'));
+            $select->where('date_created <= :date_created_end')
+                ->setParameter('date_created_end', $filter->getDateCreatedEnd()->format('Y-m-d H:i:s'));
         }
         if ($filter->getDateExpiresStart() !== null) {
-            $select->where('date_expires >= ?', $filter->getDateExpiresStart()->format('Y-m-d H:i:s'));
+            $select->where('date_expires >= :date_expires_start')
+                ->set('date_expires_start', $filter->getDateExpiresStart()->format('Y-m-d H:i:s'));
         }
         if ($filter->getDateExpiresEnd() !== null) {
-            $select->where('date_expires <= ?', $filter->getDateExpiresEnd()->format('Y-m-d H:i:s'));
+            $select->where('date_expires <= :date_expires_end')
+                ->setParameter('date_expires_end', $filter->getDateExpiresEnd()->format('Y-m-d H:i:s'));
         }
-        $filter->setTotalResults($this->getCount($select));
-        $select->limitPage($filter->getPage(), $filter->getPerPage());
+        $this->applyCountAndLimit($select, $filter);
 
         return $this->getDb()->fetchAll($select);
     }

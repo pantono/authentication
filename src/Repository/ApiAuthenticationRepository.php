@@ -9,7 +9,7 @@ class ApiAuthenticationRepository extends DefaultRepository
 {
     public function getApiTokenByToken(string $token): ?array
     {
-        return $this->getDb()->fetchRow($this->getDb()->select()->from('api_token')->where('token=?', $token));
+        return $this->selectSingleRow($this->appendTablePrefix('api_token'), 'token', $token);
     }
 
     public function updateApiTokenLastSeen(ApiToken $token): void
