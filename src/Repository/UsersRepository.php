@@ -12,7 +12,7 @@ class UsersRepository extends DefaultRepository
 {
     public function getUserById(int $id): ?array
     {
-        return $this->selectSingleRow($this->pt('user'), 'id', $id);
+        return $this->selectSingleRow('user', 'id', $id);
     }
 
     public function getPermissionsForUser(UserInterface $user): array
