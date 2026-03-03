@@ -27,7 +27,7 @@ class UsersRepository extends DefaultRepository
 
     public function getAllPermissions(): array
     {
-        return $this->selectAll($this->pt('permission'), 'name');
+        return $this->selectAll('permission', 'name');
     }
 
     public function getGroupsForUser(UserInterface $user): array
@@ -42,7 +42,7 @@ class UsersRepository extends DefaultRepository
 
     public function saveUser(User $user): void
     {
-        $id = $this->insertOrUpdate($this->pt('user'), 'id', $user->getId(), $user->getAllData());
+        $id = $this->insertOrUpdate('user', 'id', $user->getId(), $user->getAllData());
         if ($id) {
             $user->setId($id);
         }
