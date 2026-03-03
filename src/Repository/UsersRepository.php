@@ -12,13 +12,13 @@ class UsersRepository extends DefaultRepository
 {
     public function getUserById(int $id): ?array
     {
-        return $this->selectSingleRow('user', 'id', $id);
+        return $this->selectSingleRow($this->pt('user'), 'id', $id);
     }
 
     public function getPermissionsForUser(UserInterface $user): array
     {
-        $select = $this->getDb()->select('p.*')->from('user_permission', 'up')
-            ->innerJoin('up', 'permission', 'p', 'up.permission_id=p.id')
+        $select = $this->getDb()->select('p.*')->from($this->pt('user_permission'), 'up')
+            ->innerJoin('up', $this->pt('permission'), 'p', 'up.permission_id=p.id')
             ->where('up.user_id=:id')
             ->setParameter('id', $user->getId());
 
@@ -27,13 +27,13 @@ class UsersRepository extends DefaultRepository
 
     public function getAllPermissions(): array
     {
-        return $this->selectAll('permission', 'name');
+        return $this->selectAll($this->pt('permission'), 'name');
     }
 
     public function getGroupsForUser(UserInterface $user): array
     {
-        $select = $this->getDb()->select('g.*')->from('user_group', 'ug')
-            ->innerJoin('ug', 'group', 'g', 'ug.group_id=g.id')
+        $select = $this->getDb()->select('g.*')->from($this->pt('user_group'), 'ug')
+            ->innerJoin('ug', $this->pt('group'), 'g', 'ug.group_id=g.id')
             ->where('ug.user_id=:id')
             ->setParameter('id', $user->getId());
 
@@ -42,24 +42,24 @@ class UsersRepository extends DefaultRepository
 
     public function saveUser(User $user): void
     {
-        $id = $this->insertOrUpdate('user', 'id', $user->getId(), $user->getAllData());
+        $id = $this->insertOrUpdate($this->pt('user'), 'id', $user->getId(), $user->getAllData());
         if ($id) {
             $user->setId($id);
         }
 
-        $this->getDb()->delete('user_group', ['user_id=?' => $user->getId()]);
+        $this->getDb()->delete($this->pt('user_group'), ['user_id=?' => $user->getId()]);
         foreach ($user->getGroups() as $group) {
-            $this->getDb()->insert('user_group', ['user_id' => $user->getId(), 'group_id' => $group->getId()]);
+            $this->getDb()->insert($this->pt('user_group'), ['user_id' => $user->getId(), 'group_id' => $group->getId()]);
         }
 
-        $this->getDb()->delete('user_permission', ['user_id=?' => $user->getId()]);
+        $this->getDb()->delete($this->pt('user_permission'), ['user_id=?' => $user->getId()]);
         foreach ($user->getPermissions() as $permission) {
-            $this->getDb()->insert('user_permission', ['user_id' => $user->getId(), 'permission_id' => $permission->getId()]);
+            $this->getDb()->insert($this->pt('user_permission'), ['user_id' => $user->getId(), 'permission_id' => $permission->getId()]);
         }
 
         $ids = [];
         foreach ($user->getFields() as $field) {
-            $id = $this->insertOrUpdate('user_field', 'id', $field->getId(), [
+            $id = $this->insertOrUpdate($this->pt('user_field'), 'id', $field->getId(), [
                 'user_id' => $user->getId(),
                 'field_type_id' => $field->getType()->getId(),
                 'value' => $field->getValue()
@@ -74,7 +74,7 @@ class UsersRepository extends DefaultRepository
         if (!empty($ids)) {
             $params['id NOT IN (?)'] = $ids;
         }
-        $this->getDb()->delete('user_field', $params);
+        $this->getDb()->delete($this->pt('user_field'), $params);
     }
 
     public function getFieldsForUser(User $user): array
@@ -99,7 +99,7 @@ class UsersRepository extends DefaultRepository
 
     public function getUsersByFilter(UserFilter $filter): array
     {
-        $select = $this->getDb()->select('u.*')->from('user', 'u');
+        $select = $this->getDb()->select('u.*')->from($this->pt('user'), 'u');
 
         if ($filter->getSearch()) {
             $select->where('(u.forename like :search OR u.surname like :search or u.email_address like :search)')
@@ -159,7 +159,7 @@ class UsersRepository extends DefaultRepository
 
     public function addHistoryForUser(User $user, string $entry, User $byUser, array $context = []): void
     {
-        $this->getDb()->insert('user_history', [
+        $this->getDb()->insert($this->pt('user_history'), [
             'target_user_id' => $user->getId(),
             'date' => (new \DateTime())->format('Y-m-d H:i:s'),
             'entry' => $entry,
@@ -185,9 +185,9 @@ class UsersRepository extends DefaultRepository
 
     public function getUserByField(string $field, mixed $value): ?array
     {
-        $select = $this->getDb()->select('u.*')->from('user', 'u')
-            ->innerJoin('u', 'user_field', 'uf', 'u.id=uf.user_id')
-            ->innerJoin('uf', 'user_field_type', 'ut', 'uf.field_type_id=ut.id')
+        $select = $this->getDb()->select('u.*')->from($this->pt('user'), 'u')
+            ->innerJoin('u', $this->pt('user_field'), 'uf', 'u.id=uf.user_id')
+            ->innerJoin('uf', $this->pt('user_field_type'), 'ut', 'uf.field_type_id=ut.id')
             ->where('u.value=:value')
             ->where('ut.name=:field')
             ->setParameter('value', $value)
@@ -199,7 +199,7 @@ class UsersRepository extends DefaultRepository
 
     public function getUserHistoryByFilter(UserHistoryFilter $filter): array
     {
-        $select = $this->getDb()->select('uh.*')->from('user_history', 'uh');
+        $select = $this->getDb()->select('uh.*')->from($this->pt('user_history'), 'uh');
 
         if ($filter->getUser() !== null) {
             $select->where('uh.target_user_id=:target_user_id')
