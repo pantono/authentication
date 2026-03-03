@@ -19,7 +19,8 @@ class UsersRepository extends DefaultRepository
     {
         $select = $this->getDb()->select('p.*')->from('user_permission', 'up')
             ->innerJoin('up', 'permission', 'p', 'up.permission_id=p.id')
-            ->where('up.user_id=?', $user->getId());
+            ->where('up.user_id=:id')
+            ->setParameter('id', $user->getId());
 
         return $this->getDb()->fetchAll($select);
     }
@@ -33,7 +34,8 @@ class UsersRepository extends DefaultRepository
     {
         $select = $this->getDb()->select('g.*')->from('user_group', 'ug')
             ->innerJoin('ug', 'group', 'g', 'ug.group_id=g.id')
-            ->where('ug.user_id=?', $user->getId());
+            ->where('ug.user_id=:id')
+            ->setParameter('id', $user->getId());
 
         return $this->getDb()->fetchAll($select);
     }
@@ -218,7 +220,7 @@ class UsersRepository extends DefaultRepository
         }
 
         $this->applyCountAndLimit($select, $filter);
-        
+
         return $this->getDb()->fetchAll($select);
     }
 }
