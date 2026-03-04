@@ -12,7 +12,7 @@ class UsersRepository extends DefaultRepository
 {
     public function getUserById(int $id): ?array
     {
-        return $this->selectSingleRow('user', 'id', $id);
+        return $this->selectSingleRow($this->pt('user'), 'id', $id);
     }
 
     public function getPermissionsForUser(UserInterface $user): array
@@ -27,7 +27,7 @@ class UsersRepository extends DefaultRepository
 
     public function getAllPermissions(): array
     {
-        return $this->selectAll('permission', 'name');
+        return $this->selectAll($this->pt('permission'), 'name');
     }
 
     public function getGroupsForUser(UserInterface $user): array
@@ -42,17 +42,17 @@ class UsersRepository extends DefaultRepository
 
     public function saveUser(User $user): void
     {
-        $id = $this->insertOrUpdate('user', 'id', $user->getId(), $user->getAllData());
+        $id = $this->insertOrUpdate($this->pt('user'), 'id', $user->getId(), $user->getAllData());
         if ($id) {
             $user->setId($id);
         }
 
-        $this->getDb()->delete($this->pt('user_group'), ['user_id=?' => $user->getId()]);
+        $this->getDb()->delete($this->pt('user_group'), ['user_id' => $user->getId()]);
         foreach ($user->getGroups() as $group) {
             $this->getDb()->insert($this->pt('user_group'), ['user_id' => $user->getId(), 'group_id' => $group->getId()]);
         }
 
-        $this->getDb()->delete($this->pt('user_permission'), ['user_id=?' => $user->getId()]);
+        $this->getDb()->delete($this->pt('user_permission'), ['user_id' => $user->getId()]);
         foreach ($user->getPermissions() as $permission) {
             $this->getDb()->insert($this->pt('user_permission'), ['user_id' => $user->getId(), 'permission_id' => $permission->getId()]);
         }
@@ -79,22 +79,22 @@ class UsersRepository extends DefaultRepository
 
     public function getFieldsForUser(User $user): array
     {
-        return $this->selectRowsByValues('user_field', ['user_id' => $user->getId()]);
+        return $this->selectRowsByValues($this->pt('user_field'), ['user_id' => $user->getId()]);
     }
 
     public function getUserFieldTypeById(int $id): ?array
     {
-        return $this->selectSingleRow('user_field_type', 'id', $id);
+        return $this->selectSingleRow($this->pt('user_field_type'), 'id', $id);
     }
 
     public function getUserFieldTypeByName(string $name): ?array
     {
-        return $this->selectSingleRow('user_field_type', 'name', $name);
+        return $this->selectSingleRow($this->pt('user_field_type'), 'name', $name);
     }
 
     public function getUserByEmailAddress(string $emailAddress): ?array
     {
-        return $this->selectSingleRow('user', 'email_address', $emailAddress);
+        return $this->selectSingleRow($this->pt('user'), 'email_address', $emailAddress);
     }
 
     public function getUsersByFilter(UserFilter $filter): array
@@ -170,17 +170,17 @@ class UsersRepository extends DefaultRepository
 
     public function getAllGroups(): array
     {
-        return $this->selectAll('group', 'name ASC');
+        return $this->selectAll($this->pt('group'), 'name ASC');
     }
 
     public function getGroupById(int $id): ?array
     {
-        return $this->selectSingleRow('user', 'id', $id);
+        return $this->selectSingleRow($this->pt('user'), 'id', $id);
     }
 
     public function getPermissionById(int $id): ?array
     {
-        return $this->selectSingleRow('permission', 'id', $id);
+        return $this->selectSingleRow($this->pt('permission'), 'id', $id);
     }
 
     public function getUserByField(string $field, mixed $value): ?array
