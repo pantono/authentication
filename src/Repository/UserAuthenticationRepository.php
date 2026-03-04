@@ -15,7 +15,7 @@ class UserAuthenticationRepository extends DefaultRepository
 {
     public function getUserByToken(string $token): ?array
     {
-        $select = $this->getDb()->select('user.*')->from('user_token', 'u')
+        $select = $this->getDb()->select('user.*')->from($this->pt('user_token'), 'u')
             ->innerJoin('u', 'user_token', 't', 'u.id=t.user_id')
             ->where('t.token=:token')
             ->setParameter('token', $token);
@@ -25,12 +25,12 @@ class UserAuthenticationRepository extends DefaultRepository
 
     public function getUserTokenByToken(string $token): ?array
     {
-        return $this->selectSingleRow('user_token', $token);
+        return $this->selectSingleRow($this->pt('user_token'), 'token', $token);
     }
 
     public function saveToken(UserToken $token): void
     {
-        $id = $this->insertOrUpdate('user_token', 'id', $token->getId(), $token->getAllData());
+        $id = $this->insertOrUpdate($this->pt('user_token'), 'id', $token->getId(), $token->getAllData());
         if ($id) {
             $token->setId($id);
         }
@@ -38,7 +38,7 @@ class UserAuthenticationRepository extends DefaultRepository
 
     public function getSocialProviderById(int $id): ?array
     {
-        return $this->selectSingleRow('login_provider', 'id', $id);
+        return $this->selectSingleRow($this->pt('login_provider'), 'id', $id);
     }
 
     public function getSocialLoginsForUser(UserInterface $user): array
@@ -57,7 +57,7 @@ class UserAuthenticationRepository extends DefaultRepository
 
     public function getUserByProviderLogin(LoginProvider $provider, string $providerUserId): ?array
     {
-        $select = $this->getDb()->select('lp.*')->from('login_provider_user', 'lp')
+        $select = $this->getDb()->select('lp.*')->from($this->pt('login_provider_user'), 'lp')
             ->innerJoin('lp', 'user', 'u', 'u.id=lp.user_id')
             ->where('lp.provider_id=:provider_id')
             ->where('lp.provider_user_id=:provider_user_id')
@@ -69,14 +69,14 @@ class UserAuthenticationRepository extends DefaultRepository
 
     public function updateTokenLastSeen(UserToken $token): void
     {
-        $this->getDb()->update('user_token', [
+        $this->getDb()->update($this->pt('user_token'), [
             'date_last_used' => $token->getDateLastUsed()->format('Y-m-d H:i:s')
-        ], ['id=?' => $token->getId()]);
+        ], ['id' => $token->getId()]);
     }
 
     public function addLogForProvider(?LoginProvider $provider, string $entry, ?string $ipAddress, ?int $userId, ?string $sessionId = null, ?array $data = null): void
     {
-        $this->getDb()->insert('authentication_log', [
+        $this->getDb()->insert($this->pt('authentication_log'), [
             'provider_id' => $provider?->getId(),
             'date' => (new \DateTime())->format('Y-m-d H:i:s'),
             'entry' => $entry,
@@ -89,32 +89,32 @@ class UserAuthenticationRepository extends DefaultRepository
 
     public function getProviderTypeById(int $id): ?array
     {
-        return $this->selectSingleRow('login_provider_type', 'id', $id);
+        return $this->selectSingleRow($this->pt('login_provider_type'), 'id', $id);
     }
 
     public function getUserTokenById(int $id): ?array
     {
-        return $this->selectSingleRow('user_token', 'id', $id);
+        return $this->selectSingleRow($this->pt('user_token'), 'id', $id);
     }
 
     public function getLoginProviderUserById(int $id): ?array
     {
-        return $this->selectSingleRow('login_provider_user', 'id', $id);
+        return $this->selectSingleRow($this->pt('login_provider_user'), 'id', $id);
     }
 
     public function getPasswordResetByToken(string $token): ?array
     {
-        return $this->selectSingleRow('user_password_reset', 'token', $token);
+        return $this->selectSingleRow($this->pt('user_password_reset'), 'token', $token);
     }
 
     public function getPasswordResetById(int $id): ?array
     {
-        return $this->selectSingleRow('user_password_reset', 'id', $id);
+        return $this->selectSingleRow($this->pt('user_password_reset'), 'id', $id);
     }
 
     public function savePasswordReset(UserPasswordReset $passwordReset): void
     {
-        $id = $this->insertOrUpdate('user_password_reset', 'id', $passwordReset->getId(), $passwordReset->getAllData());
+        $id = $this->insertOrUpdate($this->pt('user_password_reset'), 'id', $passwordReset->getId(), $passwordReset->getAllData());
         if ($id) {
             $passwordReset->setId($id);
         }
@@ -122,7 +122,7 @@ class UserAuthenticationRepository extends DefaultRepository
 
     public function getPasswordResetsByFilter(PasswordResetFilter $filter): array
     {
-        $select = $this->getDb()->select('upr.*')->from('user_password_reset', 'upr');
+        $select = $this->getDb()->select('upr.*')->from($this->pt('user_password_reset'), 'upr');
 
         if ($filter->getUser()) {
             $select->where('upr.user_id=:user_id')
@@ -155,17 +155,17 @@ class UserAuthenticationRepository extends DefaultRepository
 
     public function getOneTimeLinkByToken(string $token): ?array
     {
-        return $this->selectSingleRow('login_one_time_link', 'token', $token);
+        return $this->selectSingleRow($this->pt('login_one_time_link'), 'token', $token);
     }
 
     public function getOneTimeLinkById(int $id): ?array
     {
-        return $this->selectSingleRow('login_one_time_link', 'id', $id);
+        return $this->selectSingleRow($this->pt('login_one_time_link'), 'id', $id);
     }
 
     public function saveOneTimeLink(LoginOneTimeLink $link): void
     {
-        $id = $this->insertOrUpdate('login_one_time_link', 'id', $link->getId(), $link->getAllData());
+        $id = $this->insertOrUpdate($this->pt('login_one_time_link'), 'id', $link->getId(), $link->getAllData());
         if ($id) {
             $link->setId($id);
         }
