@@ -58,6 +58,7 @@ class UsersRepository extends DefaultRepository
         }
 
         $ids = [];
+        $delete = $this->getDb()->createQueryBuilder()->delete($this->pt('user_field'))->where('user_id=:user_id')->setParameter('user_id', $user->getId());
         foreach ($user->getFields() as $field) {
             $id = $this->insertOrUpdate($this->pt('user_field'), 'id', $field->getId(), [
                 'user_id' => $user->getId(),
@@ -70,11 +71,11 @@ class UsersRepository extends DefaultRepository
             $ids[] = $id;
         }
 
-        $params = ['user_id=?' => $user->getId()];
         if (!empty($ids)) {
-            $params['id NOT IN (?)'] = $ids;
+            $delete->andWhere('id NOT IN (:ids)')
+                ->setParameter('ids', $ids);
         }
-        $this->getDb()->delete($this->pt('user_field'), $params);
+        $delete->executeQuery();
     }
 
     public function getFieldsForUser(User $user): array
