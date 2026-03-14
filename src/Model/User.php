@@ -11,6 +11,7 @@ use Pantono\Authentication\Users;
 use Pantono\Authentication\Exception\PasswordAuthNotAvailableException;
 use Pantono\Contracts\Attributes\DatabaseTable;
 use Pantono\Contracts\Attributes\Database\OneToMany;
+use Pantono\Contracts\Attributes\Database\ManyToMany;
 
 #[DatabaseTable('user')]
 class User implements UserInterface
@@ -27,10 +28,11 @@ class User implements UserInterface
     private ?string $password = null;
     private bool $deleted;
     private bool $disabled;
+    //#[Locator(methodName: 'getPermissionsForUser', className: Users::class), FieldName('$this')]
     /**
      * @var Permission[]
      */
-    #[Locator(methodName: 'getPermissionsForUser', className: Users::class), FieldName('$this')]
+    #[ManyToMany(joinTable: 'user_permission', joinColumn: 'user_id', inverseJoinColumn: 'permission_id', targetModel: Permission::class)]
     private array $permissions = [];
     /**
      * @var Group[]
