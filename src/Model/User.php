@@ -28,7 +28,6 @@ class User implements UserInterface
     private ?string $password = null;
     private bool $deleted;
     private bool $disabled;
-    //#[Locator(methodName: 'getPermissionsForUser', className: Users::class), FieldName('$this')]
     /**
      * @var Permission[]
      */
