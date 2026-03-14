@@ -2,13 +2,12 @@
 
 namespace Pantono\Authentication\Model;
 
-use Pantono\Contracts\Attributes\Locator;
 use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Contracts\Attributes\NoSave;
 use Pantono\Database\Traits\SavableModel;
 use Pantono\Contracts\Attributes\Lazy;
-use Pantono\Authentication\Users;
 use Pantono\Contracts\Attributes\DatabaseTable;
+use Pantono\Contracts\Attributes\Database\OneToOne;
 
 #[DatabaseTable('user_token')]
 class UserToken
@@ -24,7 +23,7 @@ class UserToken
     private \DateTimeInterface $dateCreated;
     private \DateTimeInterface $dateExpires;
     private \DateTimeInterface $dateLastUsed;
-    #[Locator(methodName: 'getUserById', className: Users::class), FieldName('user_id'), NoSave, Lazy]
+    #[OneToOne(targetModel: User::class), FieldName('user_id'), NoSave, Lazy]
     private ?User $user = null;
 
     public function getId(): ?int

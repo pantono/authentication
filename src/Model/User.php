@@ -5,9 +5,7 @@ namespace Pantono\Authentication\Model;
 use Pantono\Contracts\Locator\UserInterface;
 use Pantono\Authentication\Exception\PasswordNeedsRehashException;
 use Pantono\Database\Traits\SavableModel;
-use Pantono\Contracts\Attributes\Locator;
 use Pantono\Contracts\Attributes\FieldName;
-use Pantono\Authentication\Users;
 use Pantono\Authentication\Exception\PasswordAuthNotAvailableException;
 use Pantono\Contracts\Attributes\DatabaseTable;
 use Pantono\Contracts\Attributes\Database\OneToMany;
@@ -36,7 +34,7 @@ class User implements UserInterface
     /**
      * @var Group[]
      */
-    #[Locator(methodName: 'getGroupsForUser', className: Users::class), FieldName('$this')]
+    #[ManyToMany(joinTable: 'user_group', joinColumn: 'user_id', inverseJoinColumn: 'group_id', targetModel: Group::class)]
     private array $groups = [];
     /**
      * @var UserField[]

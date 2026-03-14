@@ -6,8 +6,10 @@ use Pantono\Contracts\Attributes\FieldName;
 use Pantono\Contracts\Attributes\Locator;
 use Pantono\Authentication\Verification;
 use Pantono\Database\Traits\SavableModel;
-use Pantono\Authentication\Users;
 use Pantono\Contracts\Attributes\DatabaseTable;
+use Pantono\Contracts\Attributes\Database\OneToOne;
+use Pantono\Contracts\Attributes\NoSave;
+use Pantono\Contracts\Attributes\Lazy;
 
 #[DatabaseTable('user_verification')]
 class UserVerification
@@ -15,7 +17,7 @@ class UserVerification
     use SavableModel;
 
     private ?int $id = null;
-    #[Locator(methodName: 'getUserById', className: Users::class), FieldName('user_id')]
+    #[OneToOne(targetModel: User::class), FieldName('user_id'), NoSave, Lazy]
     private User $user;
     #[FieldName('type_id'), Locator(methodName: 'getTypeById', className: Verification::class)]
     private ?UserVerificationType $type = null;
