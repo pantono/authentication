@@ -82,6 +82,7 @@ class Users
     public function updateUserPassword(User $user, string $password): void
     {
         $user->setPassword(password_hash($password, PASSWORD_DEFAULT));
+        $this->saveUser($user);
     }
 
     public function saveUser(User $user): void
