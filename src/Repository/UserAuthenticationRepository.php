@@ -125,27 +125,27 @@ class UserAuthenticationRepository extends DefaultRepository
         $select = $this->getDb()->select('upr.*')->from($this->pt('user_password_reset'), 'upr');
 
         if ($filter->getUser()) {
-            $select->where('upr.user_id=:user_id')
+            $select->andWhere('upr.user_id=:user_id')
                 ->setParameter('user_id', $filter->getUser()->getId());
         }
         if ($filter->getCompleted() !== null) {
-            $select->where('upr.completed=:completed')
+            $select->andWhere('upr.completed=:completed')
                 ->setParameter('completed', $filter->getCompleted() ? 1 : 0);
         }
         if ($filter->getDateCreatedStart() !== null) {
-            $select->where('date_created >= :date_created_start')
+            $select->andWhere('date_created >= :date_created_start')
                 ->set('date_created_start', $filter->getDateCreatedStart()->format('Y-m-d H:i:s'));
         }
         if ($filter->getDateCreatedEnd() !== null) {
-            $select->where('date_created <= :date_created_end')
+            $select->andWhere('date_created <= :date_created_end')
                 ->setParameter('date_created_end', $filter->getDateCreatedEnd()->format('Y-m-d H:i:s'));
         }
         if ($filter->getDateExpiresStart() !== null) {
-            $select->where('date_expires >= :date_expires_start')
-                ->set('date_expires_start', $filter->getDateExpiresStart()->format('Y-m-d H:i:s'));
+            $select->andWhere('date_expires >= :date_expires_start')
+                ->setParameter('date_expires_start', $filter->getDateExpiresStart()->format('Y-m-d H:i:s'));
         }
         if ($filter->getDateExpiresEnd() !== null) {
-            $select->where('date_expires <= :date_expires_end')
+            $select->andWhere('date_expires <= :date_expires_end')
                 ->setParameter('date_expires_end', $filter->getDateExpiresEnd()->format('Y-m-d H:i:s'));
         }
         $this->applyCountAndLimit($select, $filter);
