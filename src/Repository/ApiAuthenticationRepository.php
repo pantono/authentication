@@ -14,7 +14,7 @@ class ApiAuthenticationRepository extends DefaultRepository
 
     public function updateApiTokenLastSeen(ApiToken $token): void
     {
-        $this->getDb()->update('api_token', ['last_used' => $token->getDateLastUsed()->format('Y-m-d H:i:s')], ['id=?' => $token->getId()]);
+        $this->getDb()->update('api_token', ['last_used' => $token->getDateLastUsed()->format('Y-m-d H:i:s')], ['id' => $token->getId()]);
     }
 
     public function saveToken(ApiToken $token): void
