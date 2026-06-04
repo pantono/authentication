@@ -19,7 +19,7 @@ class UsersRepository extends DefaultRepository
     {
         $select = $this->getDb()->select('p.*')->from($this->pt('user_permission'), 'up')
             ->innerJoin('up', $this->pt('permission'), 'p', 'up.permission_id=p.id')
-            ->where('up.user_id=:id')
+            ->andWhere('up.user_id=:id')
             ->setParameter('id', $user->getId());
 
         return $this->getDb()->fetchAll($select);
@@ -34,7 +34,7 @@ class UsersRepository extends DefaultRepository
     {
         $select = $this->getDb()->select('g.*')->from($this->pt('user_group'), 'ug')
             ->innerJoin('ug', $this->pt('group'), 'g', 'ug.group_id=g.id')
-            ->where('ug.user_id=:id')
+            ->andWhere('ug.user_id=:id')
             ->setParameter('id', $user->getId());
 
         return $this->getDb()->fetchAll($select);
@@ -97,44 +97,44 @@ class UsersRepository extends DefaultRepository
         $select = $this->getDb()->select('u.*')->from($this->pt('user'), 'u');
 
         if ($filter->getSearch()) {
-            $select->where('(u.forename like :search OR u.surname like :search or u.email_address like :search)')
+            $select->andWhere('(u.forename like :search OR u.surname like :search or u.email_address like :search)')
                 ->setParameter('search', '%' . $filter->getSearch() . '%');
         }
 
         if ($filter->getEmailAddress() !== null) {
-            $select->where('u.email_address like :email_address')
+            $select->andWhere('u.email_address like :email_address')
                 ->setParameter('email_address', '%' . $filter->getEmailAddress() . '%');
         }
         if ($filter->getForename() !== null) {
-            $select->where('u.forename like :forename')
+            $select->andWhere('u.forename like :forename')
                 ->setParameter('forename', '%' . $filter->getForename() . '%');
         }
         if ($filter->getSurname() !== null) {
-            $select->where('u.surname like :surname')
+            $select->andWhere('u.surname like :surname')
                 ->setParameter('surname', '%' . $filter->getSurname() . '%');
         }
 
         if ($filter->getPermission() !== null) {
             $select->innerJoin('u', 'user_permission', 'up', 'u.id=up.user_id')
-                ->where('up_permission_id=:permission_id')
+                ->andWhere('up_permission_id=:permission_id')
                 ->setParameter('permission_id', $filter->getPermission()->getId());
         }
 
         if ($filter->getDateCreatedStart() !== null) {
-            $select->where('date_created >= :date_created_start')
+            $select->andWhere('date_created >= :date_created_start')
                 ->setParameter('date_created_start', $filter->getDateCreatedStart()->format('Y-m-d H:i:s'));
         }
         if ($filter->getDateCreatedEnd() !== null) {
-            $select->where('date_created <= :date_created_end')
+            $select->andWhere('date_created <= :date_created_end')
                 ->setParameter('date_created_end', $filter->getDateCreatedEnd()->format('Y-m-d H:i:s'));
         }
 
         if ($filter->getDisabled() !== null) {
-            $select->where('disabled=:disabled')
+            $select->andWhere('disabled=:disabled')
                 ->setParameter('disabled', $filter->getDisabled() ? 1 : 0);
         }
         if ($filter->getDeleted() !== null) {
-            $select->where('deleted=:deleted')
+            $select->andWhere('deleted=:deleted')
                 ->setParameter('deleted', $filter->getDeleted() ? 1 : 0);
         }
 
@@ -143,7 +143,7 @@ class UsersRepository extends DefaultRepository
             $fieldTypTable = 'field_type_' . $field;
             $select->innerJoin('u', 'user_field', $fieldTable, $fieldTable . '.user_id=u.id')
                 ->innerJoin($fieldTable, 'field_type', $fieldTypTable, $fieldTypTable . '.id=' . $fieldTable . '.field_type_id')
-                ->where($fieldTypTable . '.name=:field_name')
+                ->andWhere($fieldTypTable . '.name=:field_name')
                 ->setParameter('field_name', $field);
         }
 
@@ -183,8 +183,8 @@ class UsersRepository extends DefaultRepository
         $select = $this->getDb()->select('u.*')->from($this->pt('user'), 'u')
             ->innerJoin('u', $this->pt('user_field'), 'uf', 'u.id=uf.user_id')
             ->innerJoin('uf', $this->pt('user_field_type'), 'ut', 'uf.field_type_id=ut.id')
-            ->where('u.value=:value')
-            ->where('ut.name=:field')
+            ->andWhere('u.value=:value')
+            ->andWhere('ut.name=:field')
             ->setParameter('value', $value)
             ->setParameter('field', $field);
 
@@ -197,20 +197,20 @@ class UsersRepository extends DefaultRepository
         $select = $this->getDb()->select('uh.*')->from($this->pt('user_history'), 'uh');
 
         if ($filter->getUser() !== null) {
-            $select->where('uh.target_user_id=:target_user_id')
+            $select->andWhere('uh.target_user_id=:target_user_id')
                 ->setParameter('target_user_id', $filter->getUser()->getId());
         }
         if ($filter->getStartDate() !== null) {
-            $select->where('uh.date >= :date_start')
+            $select->andWhere('uh.date >= :date_start')
                 ->setParameter('date_start', $filter->getStartDate()->format('Y-m-d H:i:s'));
         }
         if ($filter->getEndDate() !== null) {
-            $select->where('uh.date <= :date_end')
+            $select->andWhere('uh.date <= :date_end')
                 ->setParameter('date_end', $filter->getEndDate()->format('Y-m-d H:i:s'));
         }
         foreach ($filter->getFields() as $field) {
             $param = 'field_' . $field['name'];
-            $select->where('uh.context->>' . $field['name'] . ' = :' . $param)
+            $select->andWhere('uh.context->>' . $field['name'] . ' = :' . $param)
                 ->setParameter($param, $field['value']);
         }
 

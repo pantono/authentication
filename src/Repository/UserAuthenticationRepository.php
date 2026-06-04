@@ -17,7 +17,7 @@ class UserAuthenticationRepository extends DefaultRepository
     {
         $select = $this->getDb()->select('user.*')->from($this->pt('user_token'), 'u')
             ->innerJoin('u', 'user_token', 't', 'u.id=t.user_id')
-            ->where('t.token=:token')
+            ->andWhere('t.token=:token')
             ->setParameter('token', $token);
 
         return $this->getDb()->fetchRow($select);
@@ -59,8 +59,8 @@ class UserAuthenticationRepository extends DefaultRepository
     {
         $select = $this->getDb()->select('lp.*')->from($this->pt('login_provider_user'), 'lp')
             ->innerJoin('lp', 'user', 'u', 'u.id=lp.user_id')
-            ->where('lp.provider_id=:provider_id')
-            ->where('lp.provider_user_id=:provider_user_id')
+            ->andWhere('lp.provider_id=:provider_id')
+            ->andWhere('lp.provider_user_id=:provider_user_id')
             ->setParameter('provider_id', $provider->getId())
             ->setParameter('provider_user_id', $providerUserId);
 
