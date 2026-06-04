@@ -183,7 +183,7 @@ class UsersRepository extends DefaultRepository
         $select = $this->getDb()->select('u.*')->from($this->pt('user'), 'u')
             ->innerJoin('u', $this->pt('user_field'), 'uf', 'u.id=uf.user_id')
             ->innerJoin('uf', $this->pt('user_field_type'), 'ut', 'uf.field_type_id=ut.id')
-            ->andWhere('u.value=:value')
+            ->andWhere('uf.value=:value')
             ->andWhere('ut.name=:field')
             ->setParameter('value', $value)
             ->setParameter('field', $field);
