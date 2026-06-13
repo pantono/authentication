@@ -345,6 +345,11 @@ class UserAuthentication
         return $this->hydrator->hydrate(LoginOneTimeLink::class, $this->repository->getOneTimeLinkByToken($token));
     }
 
+    public function getActiveOneTimeLinkByToken(string $token): ?LoginOneTimeLink
+    {
+        return $this->hydrator->hydrate(LoginOneTimeLink::class, $this->repository->getActiveOneTimeLinkByToken($token));
+    }
+
     public function getOneTimeLinkById(int $id): ?LoginOneTimeLink
     {
         return $this->hydrator->hydrate(LoginOneTimeLink::class, $this->repository->getOneTimeLinkById($id));
@@ -363,8 +368,13 @@ class UserAuthentication
             }
         } elseif ($codeGenerationMethod === 'user_input') {
             $token = strtoupper(StringUtilities::generateRandomString(6));
-            while ($this->getOneTimeLinkByToken($token) !== null) {
+            while ($this->getActiveOneTimeLinkByToken($token) !== null) {
                 $token = strtoupper(StringUtilities::generateRandomString(6));
+            }
+        } elseif ($codeGenerationMethod === 'user_input_number') {
+            $token = StringUtilities::generateRandomNumberString(6);
+            while ($this->getActiveOneTimeLinkByToken($token) !== null) {
+                $token = StringUtilities::generateRandomNumberString(6);
             }
         } else {
             throw new \Exception('Invalid code generation method');

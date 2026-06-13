@@ -158,6 +158,16 @@ class UserAuthenticationRepository extends DefaultRepository
         return $this->selectSingleRow($this->pt('login_one_time_link'), 'token', $token);
     }
 
+    public function getActiveOneTimeLinkByToken(string $token): ?array
+    {
+        $select = $this->getDb()->select('uol.*')->from($this->pt('login_one_time_link'), 'uol')
+            ->andWhere('uol.date_expires > :date_expires')
+            ->setParameter('date_expires', (new \DateTime())->format('Y-m-d H:i:s'))
+            ->where('date_logged_in is null');
+
+        return $this->getDb()->fetchRow($select);
+    }
+
     public function getOneTimeLinkById(int $id): ?array
     {
         return $this->selectSingleRow($this->pt('login_one_time_link'), 'id', $id);
