@@ -368,12 +368,12 @@ class UserAuthentication
             }
         } elseif ($codeGenerationMethod === 'user_input') {
             $token = strtoupper(StringUtilities::generateRandomString(6));
-            while ($this->getActiveOneTimeLinkByToken($token) !== null) {
+            while ($this->getActiveOneTimeLinkByToken($token) === null) {
                 $token = strtoupper(StringUtilities::generateRandomString(6));
             }
         } elseif ($codeGenerationMethod === 'user_input_number') {
             $token = StringUtilities::generateRandomNumberString(6);
-            while ($this->getActiveOneTimeLinkByToken($token) !== null) {
+            while ($this->getActiveOneTimeLinkByToken($token) === null) {
                 $token = StringUtilities::generateRandomNumberString(6);
             }
         } else {
