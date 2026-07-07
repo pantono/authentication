@@ -19,7 +19,7 @@ class UserVerification
     private ?int $id = null;
     #[OneToOne(targetModel: User::class), FieldName('user_id'), NoSave, Lazy]
     private User $user;
-    #[FieldName('type_id'), Locator(methodName: 'getTypeById', className: Verification::class)]
+    #[OneToOne(targetModel: UserVerificationType::class), FieldName('type_id')]
     private ?UserVerificationType $type = null;
     private string $token;
     private string $code;
