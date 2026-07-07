@@ -17,7 +17,7 @@ class UserVerification
     use SavableModel;
 
     private ?int $id = null;
-    #[OneToOne(targetModel: User::class), FieldName('user_id'), NoSave, Lazy]
+    #[OneToOne(targetModel: User::class), FieldName('user_id'), Lazy]
     private User $user;
     #[OneToOne(targetModel: UserVerificationType::class), FieldName('type_id')]
     private ?UserVerificationType $type = null;
