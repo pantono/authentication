@@ -3,4 +3,4 @@ CreateUser:
 CreateApiToken:
   class: Pantono\Authentication\Command\CreateApiToken
 ChangeUserPassword:
-  class: Pantono\Authentication\Command\ChangePassword
+  class: Pantono\Authentication\Command\ChangeUserPassword
