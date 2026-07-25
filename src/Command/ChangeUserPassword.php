@@ -21,7 +21,7 @@ class ChangeUserPassword extends Command
 
     protected function configure(): void
     {
-        $this->setName('user:create')
+        $this->setName('user:change-password')
             ->addArgument('id', InputArgument::REQUIRED)
             ->addArgument('password', InputArgument::OPTIONAL);
     }
