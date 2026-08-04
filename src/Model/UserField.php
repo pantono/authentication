@@ -46,12 +46,12 @@ class UserField
         $this->type = $type;
     }
 
-    public function getValue(): string
+    public function getValue(): ?string
     {
         return $this->value;
     }
 
-    public function setValue(string $value): void
+    public function setValue(?string $value = null): void
     {
         $this->value = $value;
     }
@@ -59,6 +59,9 @@ class UserField
     public function getCastedValue(): int|string|bool|\DateTimeInterface|null
     {
         if (!$this->getType()) {
+            return $this->getValue();
+        }
+        if (!$this->getValue()) {
             return $this->getValue();
         }
         if ($this->getType()->getType() === 'integer') {

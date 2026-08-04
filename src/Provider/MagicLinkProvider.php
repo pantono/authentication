@@ -28,14 +28,7 @@ class MagicLinkProvider extends AbstractAuthenticationProvider
         if (!$user) {
             throw new UserDoesNotExistException('User does not exist');
         }
-        $expiryDate = new \DateTime('+1 hour');
-        if ($expiry !== null) {
-            try {
-                $expiryDate = new \DateTimeImmutable($expiry);
-            } catch (\Exception $e) {
-                $expiryDate = new \DateTime('+1 hour');
-            }
-        }
+        $expiryDate = new \DateTimeImmutable($expiry);
         $link = $this->authentication->createOneTimeLinkForUser($user, $expiryDate, $codeType);
         return $link->getToken();
     }

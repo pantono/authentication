@@ -105,9 +105,9 @@ class UserEvents implements EventSubscriberInterface
             }
 
             foreach ($previous->getFlatFields() as $key => $value) {
-                if ($current->getFieldByName($key) === null && in_array($key, $doneFields) === false) {
+                if (in_array($key, $doneFields) === false) {
                     $currentValue = $current->getFieldByName($key);
-                    if ($currentValue === null) {
+                    if (!$currentValue) {
                         $currentValue = 'N/A';
                     }
                     $this->users->addHistoryForUser($current, 'Changed field' . $key . ' from ' . $value . ' to ' . $currentValue, $this->getLoggedInUser());

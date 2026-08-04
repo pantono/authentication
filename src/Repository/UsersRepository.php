@@ -69,7 +69,9 @@ class UsersRepository extends DefaultRepository
             }
             $ids[] = $id;
         }
-        $this->deleteNotIn($this->pt('user_field'), 'user_id', $user->getId(), $ids);
+        if ($user->getId()) {
+            $this->deleteNotIn($this->pt('user_field'), 'user_id', $user->getId(), $ids);
+        }
     }
 
     public function getFieldsForUser(User $user): array
