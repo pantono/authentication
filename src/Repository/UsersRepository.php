@@ -118,7 +118,7 @@ class UsersRepository extends DefaultRepository
 
         if ($filter->getPermission() !== null) {
             $select->innerJoin('u', 'user_permission', 'up', 'u.id=up.user_id')
-                ->andWhere('up_permission_id=:permission_id')
+                ->andWhere('up.permission_id=:permission_id')
                 ->setParameter('permission_id', $filter->getPermission()->getId());
         }
 
