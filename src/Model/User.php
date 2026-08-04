@@ -44,6 +44,8 @@ class User implements UserInterface
     private bool $tfaEnabled = false;
     private bool $systemUser = false;
     private bool $verified = false;
+    #[OneToMany(targetModel: UserTfaMethod::class, mappedBy: 'user_id')]
+    private array $tfaMethods = [];
 
     public function getId(): ?int
     {
@@ -285,5 +287,15 @@ class User implements UserInterface
         $userField->setType($type);
         $userField->setValue($value);
         $this->fields[] = $userField;
+    }
+
+    public function getTfaMethods(): array
+    {
+        return $this->tfaMethods;
+    }
+
+    public function setTfaMethods(array $tfaMethods): void
+    {
+        $this->tfaMethods = $tfaMethods;
     }
 }
