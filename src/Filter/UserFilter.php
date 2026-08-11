@@ -25,6 +25,8 @@ class UserFilter implements PageableInterface
      * @var array<string,mixed>
      */
     private array $fields = [];
+    private string $orderColumn = 'id';
+    private string $orderDir = 'asc';
 
     public function getEmailAddress(): ?string
     {
@@ -134,5 +136,34 @@ class UserFilter implements PageableInterface
     public function addField(string $field, mixed $value): void
     {
         $this->fields[$field] = $value;
+    }
+
+    public function getOrderColumn(): string
+    {
+        return $this->orderColumn;
+    }
+
+    public function setOrderColumn(string $orderColumn): void
+    {
+        $allowed = ['email_address', 'date_created', 'date_last_login', 'forename', 'surname', 'id', 'deleted', 'disabled', 'tfa_enabled', 'system_user', 'verified'];
+        $orderColumn = strtolower($orderColumn);
+        if (!in_array($orderColumn, $allowed)) {
+            throw new \RuntimeException('Order by column not allowed');
+        }
+        $this->orderColumn = $orderColumn;
+    }
+
+    public function getOrderDir(): string
+    {
+        return $this->orderDir;
+    }
+
+    public function setOrderDir(string $orderDir): void
+    {
+        $orderDir = strtolower($orderDir);
+        if ($orderDir !== 'asc' && $orderDir !== 'desc') {
+            throw new \RuntimeException('Invalid order by direction');
+        }
+        $this->orderDir = $orderDir;
     }
 }

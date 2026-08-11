@@ -96,7 +96,8 @@ class UsersRepository extends DefaultRepository
 
     public function getUsersByFilter(UserFilter $filter): array
     {
-        $select = $this->getDb()->select('u.*')->from($this->pt('user'), 'u');
+        $select = $this->getDb()->select('u.*')->from($this->pt('user'), 'u')
+            ->orderBy($filter->getOrderColumn(), $filter->getOrderDir());
 
         if ($filter->getSearch()) {
             $select->andWhere('(u.forename like :search OR u.surname like :search or u.email_address like :search)')
