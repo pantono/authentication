@@ -118,9 +118,9 @@ class Verification
 
     private function getUniqueToken(): string
     {
-        $token = StringUtilities::generateRandomToken();
+        $token = StringUtilities::generateUrlSafeToken();
         while ($this->repository->getVerificationByToken($token)) {
-            $token = StringUtilities::generateRandomToken();
+            $token = StringUtilities::generateUrlSafeToken();
         }
         return $token;
     }
