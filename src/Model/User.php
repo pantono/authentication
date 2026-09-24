@@ -195,7 +195,7 @@ class User implements UserInterface
     public function hasPermission(string $permissionName): bool
     {
         foreach ($this->getPermissions() as $permission) {
-            if ($permission->getName() === $permissionName) {
+            if ($permission->getName() === $permissionName || $permission->containsChild($permissionName)) {
                 return true;
             }
         }
@@ -209,9 +209,9 @@ class User implements UserInterface
     {
         $permissions = [];
         foreach ($this->getPermissions() as $permission) {
-            $permissions[] = $permission->getName();
+            $permissions = array_merge($permissions, $permission->getHierarchicalNames());
         }
-        return $permissions;
+        return array_values(array_unique($permissions));
     }
 
     public function getFields(): array

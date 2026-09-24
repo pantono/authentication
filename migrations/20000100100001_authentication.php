@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-use Phinx\Migration\AbstractMigration;
+use Pantono\Database\Migration\Base\BasePantonoMigration;
 
-final class Authentication extends AbstractMigration
+final class Authentication extends BasePantonoMigration
 {
     use \Pantono\Database\Migration\Traits\ReseedIdentityTrait;
 
     public function change(): void
     {
-        $this->table('permission')
+        $this->tablePrefix('permission')
             ->addColumn('name', 'string')
             ->addColumn('description', 'string')
             ->create();
 
-        $this->table('group')
+        $this->tablePrefix('group')
             ->addColumn('name', 'string')
             ->addColumn('description', 'string')
             ->create();
 
-        $this->table('user')
+        $this->tablePrefix('user')
             ->addColumn('email_address', 'string')
             ->addColumn('date_created', 'datetime')
             ->addColumn('date_last_login', 'datetime', ['null' => true])
@@ -35,14 +35,14 @@ final class Authentication extends AbstractMigration
             ->addIndex(['email_address'], ['unique' => true])
             ->create();
 
-        $this->table('user_field_type')
+        $this->tablePrefix('user_field_type')
             ->addColumn('name', 'string')
             ->addColumn('label', 'string')
             ->addColumn('type', 'string')
             ->addColumn('required', 'boolean')
             ->create();
 
-        $this->table('user_field')
+        $this->tablePrefix('user_field')
             ->addColumn('user_id', 'integer', ['signed' => false])
             ->addColumn('field_type_id', 'integer', ['signed' => false])
             ->addColumn('value', 'text')
@@ -50,21 +50,21 @@ final class Authentication extends AbstractMigration
             ->addForeignKey('user_id', 'user', 'id')
             ->create();
 
-        $this->table('user_permission', ['id' => false])
+        $this->tablePrefix('user_permission', ['id' => false])
             ->addColumn('user_id', 'integer', ['signed' => false])
             ->addColumn('permission_id', 'integer', ['signed' => false])
             ->addForeignKey('user_id', 'user', 'id')
             ->addForeignKey('permission_id', 'permission', 'id')
             ->create();
 
-        $this->table('user_group', ['id' => false])
+        $this->tablePrefix('user_group', ['id' => false])
             ->addColumn('user_id', 'integer', ['signed' => false])
             ->addColumn('group_id', 'integer', ['signed' => false])
             ->addForeignKey('user_id', 'user', 'id')
             ->addForeignKey('group_id', 'group', 'id')
             ->create();
 
-        $this->table('api_token')
+        $this->tablePrefix('api_token')
             ->addColumn('application_name', 'string')
             ->addColumn('token', 'string')
             ->addColumn('date_created', 'datetime')
@@ -72,7 +72,7 @@ final class Authentication extends AbstractMigration
             ->addColumn('date_last_used', 'datetime')
             ->create();
 
-        $this->table('user_token')
+        $this->tablePrefix('user_token')
             ->addColumn('user_id', 'integer', ['signed' => false])
             ->addColumn('api_token_id', 'integer', ['signed' => false, 'null' => true])
             ->addColumn('token', 'text', ['length' => \Phinx\Db\Adapter\MysqlAdapter::TEXT_MEDIUM])
@@ -83,7 +83,7 @@ final class Authentication extends AbstractMigration
             ->addForeignKey('api_token_id', 'api_token', 'id')
             ->create();
 
-        $this->table('user_password_reset')
+        $this->tablePrefix('user_password_reset')
             ->addColumn('user_id', 'integer', ['signed' => false])
             ->addColumn('token', 'string')
             ->addColumn('date_created', 'datetime')
@@ -92,7 +92,7 @@ final class Authentication extends AbstractMigration
             ->addForeignKey('user_id', 'user', 'id')
             ->create();
 
-        $this->table('login_provider_type')
+        $this->tablePrefix('login_provider_type')
             ->addColumn('name', 'string')
             ->addColumn('provider_class', 'string')
             ->addColumn('allows_registration', 'boolean', ['default' => 0])
@@ -101,7 +101,7 @@ final class Authentication extends AbstractMigration
             ->create();
 
         if ($this->isMigratingUp()) {
-            $this->table('login_provider_type')
+            $this->tablePrefix('login_provider_type')
                 ->insert([
                     ['name' => 'Username & Password', 'provider_class' => 'Pantono\Authentication\Provider\PasswordAuthentication', 'allows_registration' => 1, 'required_fields' => json_encode([
                         ['name' => 'requires_verification', 'label' => 'Requires Email Verification', 'type' => 'boolean', 'required' => true],
@@ -120,14 +120,14 @@ final class Authentication extends AbstractMigration
                 ])->saveData();
         }
 
-        $this->table('login_provider')
+        $this->tablePrefix('login_provider')
             ->addColumn('type_id', 'integer', ['signed' => false])
             ->addColumn('config', 'json')
             ->addColumn('enabled', 'boolean', ['default' => true])
             ->addForeignKey('type_id', 'login_provider_type', 'id')
             ->create();
 
-        $this->table('login_provider_user')
+        $this->tablePrefix('login_provider_user')
             ->addColumn('user_id', 'integer', ['signed' => false])
             ->addColumn('provider_id', 'integer', ['signed' => false])
             ->addColumn('provider_user_id', 'string') // The unique ID from the provider
@@ -141,7 +141,7 @@ final class Authentication extends AbstractMigration
             ->addForeignKey('provider_id', 'login_provider', 'id')
             ->create();
 
-        $this->table('user_history')
+        $this->tablePrefix('user_history')
             ->addColumn('target_user_id', 'integer', ['signed' => false])
             ->addColumn('by_user_id', 'integer', ['signed' => false, 'null' => true])
             ->addColumn('date', 'datetime')
@@ -151,7 +151,7 @@ final class Authentication extends AbstractMigration
             ->addForeignKey('by_user_id', 'user', 'id', ['delete' => 'CASCADE'])
             ->create();
 
-        $this->table('authentication_log')
+        $this->tablePrefix('authentication_log')
             ->addColumn('provider_id', 'integer', ['signed' => false])
             ->addColumn('date', 'datetime')
             ->addColumn('session_id', 'string')
@@ -165,12 +165,12 @@ final class Authentication extends AbstractMigration
             ->create();
 
         if ($this->isMigratingUp()) {
-            $this->table('user')
+            $this->tablePrefix('user')
                 ->insert([
                     ['id' => 1, 'date_created' => (new \DateTime)->format('Y-m-d H:i:s'), 'email_address' => 'unknown@user', 'forename' => 'Unknown', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => '', 'system_user' => 1],
                     ['id' => 2, 'date_created' => (new \DateTime)->format('Y-m-d H:i:s'), 'email_address' => 'system@user', 'forename' => 'System', 'surname' => 'User', 'deleted' => 0, 'disabled' => 1, 'password' => '', 'system_user' => 1],
                 ])->saveData();
-            $this->reseedIdentity('user');
+            $this->reseedIdentity($this->addTablePrefix('user'));
         }
 
         $this->table('tfa_type')
@@ -187,7 +187,7 @@ final class Authentication extends AbstractMigration
                     ['id' => 2, 'name' => 'SMS', 'description' => 'An SMS sent to your mobile phone', 'enabled' => 0, 'controller' => 'Pantono\Authentication\Provider\Tfa\SmsTfaProvider', 'config' => json_encode(['verification_required' => true, 'sid' => '', 'token' => '', 'from_number' => ''])],
                     ['id' => 3, 'name' => 'TOTP', 'description' => 'A time-based one-time password', 'enabled' => 0, 'controller' => 'Pantono\Authentication\Provider\Tfa\TotpTfaProvider', 'config' => json_encode(['qr_label' => 'Pantono'])],
                 ])->save();
-            $this->reseedIdentity('tfa_type');
+            $this->reseedIdentity($this->addTablePrefix('tfa_type'));
         }
 
         $this->table('user_tfa_method')

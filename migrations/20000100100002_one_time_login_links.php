@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Phinx\Migration\AbstractMigration;
+use Pantono\Database\Migration\Base\BasePantonoMigration;
 
-final class OneTimeLoginLinks extends AbstractMigration
+final class OneTimeLoginLinks extends BasePantonoMigration
 {
     public function change(): void
     {
-        $this->table('login_one_time_link')
+        $this->tablePrefix('login_one_time_link')
             ->addColumn('user_id', 'integer')
             ->addColumn('date_created', 'datetime')
             ->addColumn('date_expires', 'datetime')
