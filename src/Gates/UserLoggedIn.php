@@ -8,9 +8,8 @@ use Pantono\Contracts\Endpoint\EndpointDefinitionInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Pantono\Contracts\Security\SecurityContextInterface;
-use Pantono\Authentication\Exception\AccessDeniedException;
-use Pantono\Authentication\UserAuthentication;
 use Pantono\Authentication\Users;
+use Pantono\Authentication\Exception\InvalidCredentials;
 
 class UserLoggedIn implements SecurityGateInterface
 {
@@ -29,11 +28,11 @@ class UserLoggedIn implements SecurityGateInterface
     {
         $userId = $this->session->get('user_id');
         if ($userId === null) {
-            throw new AccessDeniedException('You are not logged in');
+            throw new InvalidCredentials('You are not logged in');
         }
         $user = $this->users->getUserById($userId);
         if ($user === null) {
-            throw new AccessDeniedException('You are not logged in');
+            throw new InvalidCredentials('You are not logged in');
         }
         $this->securityContext->set('user', $user);
     }

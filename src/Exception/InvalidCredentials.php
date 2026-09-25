@@ -2,10 +2,10 @@
 
 namespace Pantono\Authentication\Exception;
 
-class AccessDeniedException extends \RuntimeException
+class InvalidCredentials extends \RuntimeException
 {
     public function __construct(string $message)
     {
-        parent::__construct($message, 403);
+        parent::__construct($message, 401);
     }
 }

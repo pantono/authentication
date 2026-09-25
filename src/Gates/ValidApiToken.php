@@ -12,6 +12,7 @@ use Pantono\Authentication\Event\ApiTokenAuthenticatedEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Pantono\Contracts\Endpoint\EndpointDefinitionInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Pantono\Authentication\Exception\InvalidCredentials;
 
 class ValidApiToken implements SecurityGateInterface
 {
@@ -30,15 +31,15 @@ class ValidApiToken implements SecurityGateInterface
     {
         $tokenString = $request->headers->get('ApiKey');
         if (!$tokenString) {
-            throw new AccessDeniedException('ApiKey is required');
+            throw new InvalidCredentials('ApiKey is required');
         }
 
         $token = $this->authentication->getApiTokenByToken($tokenString);
         if ($token === null) {
-            throw new AccessDeniedException('ApiKey is invalid');
+            throw new InvalidCredentials('ApiKey is invalid');
         }
         if ($token->getDateExpires() <= new \DateTime) {
-            throw new AccessDeniedException('ApiKey is expired');
+            throw new InvalidCredentials('ApiKey is expired');
         }
 
         $token->setDateLastUsed(new \DateTime);

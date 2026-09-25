@@ -6,7 +6,6 @@ use Pantono\Contracts\Security\Gate\SecurityGateInterface;
 use Pantono\Authentication\UserAuthentication;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Pantono\Authentication\Exception\AccessDeniedException;
 use Pantono\Contracts\Security\SecurityContextInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Pantono\Authentication\Event\UserAuthenticatedEvent;
@@ -15,6 +14,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Pantono\Config\Config;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use Pantono\Authentication\Exception\InvalidCredentials;
 
 class ValidUserToken implements SecurityGateInterface
 {
@@ -61,23 +61,23 @@ class ValidUserToken implements SecurityGateInterface
         }
 
         if (!$tokenString) {
-            throw new AccessDeniedException('User authentication token is required');
+            throw new InvalidCredentials('User authentication token is required');
         }
 
         $token = $this->authentication->getUserTokenByToken($tokenString);
         if ($token === null) {
-            throw new AccessDeniedException('User authentication token invalid');
+            throw new InvalidCredentials('User authentication token invalid');
         }
 
         if ($jwtUserId !== null && $decoded->data->user_id !== $jwtUserId) {
-            throw new AccessDeniedException('User authentication mismatch');
+            throw new InvalidCredentials('User authentication mismatch');
         }
 
         if ($token->getDateExpires() <= new \DateTime) {
-            throw new AccessDeniedException('You have been logged out');
+            throw new InvalidCredentials('You have been logged out');
         }
         if (!$token->getUser()) {
-            throw new AccessDeniedException('You are not logged in');
+            throw new InvalidCredentials('You are not logged in');
         }
 
         $token->setDateLastUsed(new \DateTime);
