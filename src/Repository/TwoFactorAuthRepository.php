@@ -59,9 +59,9 @@ class TwoFactorAuthRepository extends DefaultRepository
         return $this->selectSingleRow('user_tfa_method', 'id', $id);
     }
 
-    public function getAttemptBySlug(int $id): ?array
+    public function getAttemptBySlug(string $slug): ?array
     {
-        return $this->selectSingleRow('user_tfa_attempt', 'secret', $id);
+        return $this->selectSingleRow('user_tfa_attempt', 'attempt_slug', $slug);
     }
 
     public function getLastSuccessfulAttemptForUser(User $user): ?array

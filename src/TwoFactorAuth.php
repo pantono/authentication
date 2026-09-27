@@ -63,14 +63,34 @@ class TwoFactorAuth
         return $this->locator->getClassAutoWire($type->getController());
     }
 
+    public function initiateMethod(UserTfaMethod $method): ?UserTfaAttempt
+    {
+        if (!$method->getTfaType()) {
+            throw new \RuntimeException('TFA Type is invalid');
+        }
+        return $this->getControllerForType($method->getTfaType())->initiate($method);
+    }
+
+    public function verifyAttempt(UserTfaAttempt $attempt, array $data): bool
+    {
+        if (!$attempt->getMethod()) {
+            throw new \RuntimeException('TFA Method is invalid');
+        }
+        if (!$attempt->getMethod()->getTfaType()) {
+            throw new \RuntimeException('TFA Method is invalid');
+        }
+
+        return $this->getControllerForType($attempt->getMethod()->getTfaType())->verify($attempt, $data);
+    }
+
     public function getAttemptById(int $id): ?UserTfaAttempt
     {
         return $this->hydrator->hydrate(UserTfaAttempt::class, $this->repository->getAttemptById($id));
     }
 
-    public function getAttemptBySlug(int $id): ?UserTfaAttempt
+    public function getAttemptBySlug(string $slug): ?UserTfaAttempt
     {
-        return $this->hydrator->hydrate(UserTfaAttempt::class, $this->repository->getAttemptBySlug($id));
+        return $this->hydrator->hydrate(UserTfaAttempt::class, $this->repository->getAttemptBySlug($slug));
     }
 
     public function saveAttempt(UserTfaAttempt $attempt): void
