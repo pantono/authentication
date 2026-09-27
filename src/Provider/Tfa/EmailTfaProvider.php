@@ -68,7 +68,7 @@ class EmailTfaProvider extends AbstractTwoFactorAuthProvider
     public function verify(UserTfaAttempt $attempt, array $data): bool
     {
         $code = $data['code'] ?? null;
-        if ($attempt->getAttemptSlug() === $code) {
+        if ($attempt->getAttemptCode() === $code) {
             $this->auth->completeTwoFactorAuth($attempt);
             return true;
         }
