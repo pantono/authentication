@@ -107,10 +107,10 @@ class TwoFactorAuth
         if (!$attempt->getMethod()?->getUser()) {
             throw new \RuntimeException('User not found');
         }
-        $this->userAuthentication->addSuccessfulLoginForUser($attempt->getMethod()->getUser(), $provider, $attempt);
         $attempt->setVerified(true);
         $this->saveAttempt($attempt);
         $this->addLogToAttempt($attempt, 'Successfully authenticated');
+        $this->userAuthentication->addSuccessfulLoginForUser($attempt->getMethod()->getUser(), $provider, $attempt);
     }
 
     public function addLogToAttempt(UserTfaAttempt $attempt, string $string): void
