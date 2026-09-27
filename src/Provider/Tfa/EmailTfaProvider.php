@@ -80,6 +80,7 @@ class EmailTfaProvider extends AbstractTwoFactorAuthProvider
         $method = new UserTfaMethod();
         $method->setVerified(true);
         $method->setTfaType($type);
+        $method->setUserId($user->getId());
         $method->setDateCreated(new \DateTime);
         $method->setDeleted(false);
         $method->setEnabled(false);
