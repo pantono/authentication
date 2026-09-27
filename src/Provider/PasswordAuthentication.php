@@ -72,7 +72,7 @@ class PasswordAuthentication extends AbstractAuthenticationProvider
         $tfaAttempt = null;
         if ($tfaAttemptId) {
             $attempt = $this->twoFactorAuth->getAttemptById($tfaAttemptId);
-            if ($attempt->isRemember() && $attempt->getRememberExpires() && $attempt->getRememberExpires() <= new \DateTime) {
+            if ($attempt->isRemember() && $attempt->getRememberExpires() && $attempt->getRememberExpires() >= new \DateTime) {
                 $tfaAttempt = $attempt;
             }
         }
