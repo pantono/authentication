@@ -12,9 +12,17 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Pantono\Hydrator\Locator\StaticLocator;
 use Pantono\Authentication\Exception\PasswordAuthNotAvailableException;
 use Pantono\Authentication\Exception\UserAccountNotVerified;
+use Pantono\Authentication\TwoFactorAuth;
 
 class PasswordAuthentication extends AbstractAuthenticationProvider
 {
+    private TwoFactorAuth $twoFactorAuth;
+
+    public function __construct(TwoFactorAuth $twoFactorAuth)
+    {
+        $this->twoFactorAuth = $twoFactorAuth;
+    }
+
     public function initiateLogin(array $parameters = []): ?string
     {
         //No initiate needed for password auth
@@ -31,6 +39,7 @@ class PasswordAuthentication extends AbstractAuthenticationProvider
     {
         $password = $options['password'] ?? null;
         $username = $options['username'] ?? null;
+        $tfaAttemptId = $options['tfa_attempt_id'] ?? null;
         $requiresVerification = $this->getProviderConfig()->getConfigField('requires_verification');
         if (!$username) {
             throw new \InvalidArgumentException('Username is required');
@@ -60,7 +69,14 @@ class PasswordAuthentication extends AbstractAuthenticationProvider
         }
         $user->setDateLastLogin(new \DateTimeImmutable());
         $this->users->saveUser($user);
-        $this->authentication->addSuccessfulLoginForUser($user, $this->getProviderConfig());
+        $tfaAttempt = null;
+        if ($tfaAttemptId) {
+            $attempt = $this->twoFactorAuth->getAttemptById($tfaAttemptId);
+            if ($attempt->isRemember() && $attempt->getRememberExpires() && $attempt->getRememberExpires() <= new \DateTime) {
+                $tfaAttempt = $attempt;
+            }
+        }
+        $this->authentication->addSuccessfulLoginForUser($user, $this->getProviderConfig(), $tfaAttempt);
         return $user;
     }
 

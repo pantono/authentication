@@ -23,6 +23,8 @@ class UserTfaAttempt
     private bool $verified = false;
     #[NoSave]
     private bool $dummy = false;
+    private bool $remember = false;
+    private ?\DateTimeInterface $rememberExpires = null;
 
     public function getId(): ?int
     {
@@ -102,5 +104,25 @@ class UserTfaAttempt
     public function setDummy(bool $dummy): void
     {
         $this->dummy = $dummy;
+    }
+
+    public function isRemember(): bool
+    {
+        return $this->remember;
+    }
+
+    public function setRemember(bool $remember): void
+    {
+        $this->remember = $remember;
+    }
+
+    public function getRememberExpires(): ?\DateTimeInterface
+    {
+        return $this->rememberExpires;
+    }
+
+    public function setRememberExpires(?\DateTimeInterface $rememberExpires): void
+    {
+        $this->rememberExpires = $rememberExpires;
     }
 }
