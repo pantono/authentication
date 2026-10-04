@@ -6,6 +6,6 @@ class TwoFactorAuthRequired extends \RuntimeException
 {
     public function __construct()
     {
-        parent::__construct('Two Factor Authentication Required', 401);
+        parent::__construct('Two Factor Authentication Required', 428);
     }
 }
