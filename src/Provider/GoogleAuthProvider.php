@@ -101,6 +101,10 @@ class GoogleAuthProvider extends AbstractAuthenticationProvider
                 $user->setSurname($value);
             }
         }
+        $current = $this->users->getUserByEmailAddress($user->getEmailAddress());
+        if ($current !== null) {
+            return $current;
+        }
         $this->users->saveUser($user);
         return $user;
     }
