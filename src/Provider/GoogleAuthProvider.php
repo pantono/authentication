@@ -86,6 +86,9 @@ class GoogleAuthProvider extends AbstractAuthenticationProvider
         $user->setDateCreated(new \DateTimeImmutable);
         $user->setPassword('');
         foreach ($resource->toArray() as $key => $value) {
+            if ($key === 'email_verified' && $value === false) {
+                throw new GenericLoginProviderException('Your google e-mail is not verified');
+            }
             if ($key === 'email') {
                 $user->setEmailAddress($value);
             }
