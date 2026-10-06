@@ -97,6 +97,8 @@ class PasswordAuthentication extends AbstractAuthenticationProvider
         $user->setEmailAddress($parameters->get('email_address'));
         $user->setForename($parameters->get('forename'));
         $user->setSurname($parameters->get('surname'));
+        $user->setDeleted(false);
+        $user->setDisabled(false);
         $user->setPassword(password_hash($parameters->get('password'), PASSWORD_DEFAULT));
         $user->setDateCreated(new \DateTimeImmutable());
         $this->users->saveUser($user);

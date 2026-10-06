@@ -83,6 +83,8 @@ class GoogleAuthProvider extends AbstractAuthenticationProvider
         $token = $this->getTokenFromOptions($options);
         $resource = $this->getGoogleClient()->getResourceOwner($token);
         $user = new User();
+        $user->setDeleted(false);
+        $user->setDisabled(false);
         $user->setDateCreated(new \DateTimeImmutable);
         $user->setPassword('');
         foreach ($resource->toArray() as $key => $value) {
