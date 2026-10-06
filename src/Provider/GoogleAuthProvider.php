@@ -2,7 +2,6 @@
 
 namespace Pantono\Authentication\Provider;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Pantono\Contracts\Locator\UserInterface;
 use League\OAuth2\Client\Provider\Google;
 use Pantono\Hydrator\Locator\StaticLocator;
@@ -13,8 +12,6 @@ use Pantono\Authentication\Exception\GenericLoginProviderException;
 use Pantono\Authentication\Exception\UserDoesNotExistException;
 use Pantono\Authentication\Model\LoginProviderUser;
 use League\OAuth2\Client\Token\AccessToken;
-use Pantono\Utilities\DateTimeParser;
-use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use Pantono\Authentication\Model\User;
 
 class GoogleAuthProvider extends AbstractAuthenticationProvider
@@ -99,6 +96,7 @@ class GoogleAuthProvider extends AbstractAuthenticationProvider
                 $user->setSurname($value);
             }
         }
+        $this->users->saveUser($user);
         return $user;
     }
 
